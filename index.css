@@ -1,0 +1,62 @@
+body {
+	/*font-size: 1.5em;*/
+}
+header {text-align: center;}
+
+@media (min-width: 600px) {
+	main {margin: 0 3em;}
+}
+@media (min-width: 900px) {
+	main {margin: 0 5em;}
+}
+
+
+#modify {
+	text-align: right;
+}
+i.fa {
+	pointer-events: none;
+	font-size: 1.3em;
+}
+
+ol {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+li > label {
+	background-color: #eee;
+	display: block;
+	display: flex;
+}
+input:not([type]), input[type=text], li > label > span {
+	font-size: 1.2em;
+}
+input[type=checkbox] {
+/*	transform: scale(1.2) translateY(2px);
+	transform-origin: 100% 50%;
+	margin-right: .6rem;*/
+	display: none;
+}
+input[type=checkbox]:checked ~ * {
+	text-decoration: line-through;
+}
+
+span[contenteditable] {
+	white-space: nowrap;
+	display: inline-block;
+	vertical-align: middle;
+	min-width: 2em;
+	padding: .8rem;
+	margin-left: .8rem;
+	cursor: text;
+	flex: 1;
+}
+time {padding: .8rem .4rem;}
+
+button {
+	border: none;
+	background: none;
+	outline: none;
+	cursor: pointer;
+}
