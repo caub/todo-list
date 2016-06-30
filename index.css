@@ -11,8 +11,14 @@ header {text-align: center;}
 }
 
 
-#modify {
-	text-align: right;
+.buttons {
+	display: flex;
+}
+.buttons > :first-child {
+	flex:1;
+}
+button[disabled] {
+	opacity: .1;
 }
 i.fa {
 	pointer-events: none;

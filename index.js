@@ -1,78 +1,139 @@
-// Simple Todo implementation in pure JavaScript, next step will be to use React to organize and simplify it
+// in React, with undo/redo. Next step is to modularize and separate concerns (create a component TodoList for the list, Sortable for the sorting behaviour), and require modules
+
+// main React util
+const v = (tag='div', p, ...children) =>
+	!p || React.isValidElement(p)||typeof p==='string'||Array.isArray(p) ?
+		React.createElement(tag, undefined, p, ...children) :
+		React.createElement(tag, p, ...children);
 
 
-const {add, name, date, trash} = modify.elements;
+const Todos = React.createClass({
 
-modify.addEventListener('submit', e=>{
-	e.preventDefault();
-})
+	shouldComponentUpdate(p, s){
+		return s.todos!==this.state.todos || s.dragged!==this.state.dragged;
+	},
 
-name.addEventListener('click', e=>{
-	const items = Array.from(list.children);
-	items.sort((a,b)=>a.textContent>b.textContent);
-	for (let item of items)
-		list.appendChild(item);
-})
+	getInitialState(){
 
-date.addEventListener('click', e=>{
-	const items = Array.from(list.children);
-	items.sort((a,b)=>+b.dataset.time-a.dataset.time);
-	for (let item of items)
-		list.appendChild(item);
-})
+		this.history = [this.props.todos];
+		this.historyI = 0; // 0 is most recent, length-1 oldest entry
 
-trash.addEventListener('click', e=>{
-	Array.from(list.children)
-		.filter(li=>li.querySelector('input').checked)
-		.forEach(li=>li.remove());
-})
+		return {
+			todos: this.props.todos,
+			dragged: null // todo item being dragged
+		};
+	},
 
-add.addEventListener('click', e=>{
-	list.appendChild(Todo({name:'New todo #'+list.childElementCount, time: new Date()}))
-})
-
-list.addEventListener('dragstart', e=>{
-	let dragged = e.target.closest('li'), dR = dragged.rect(), dC = (dR.top+dR.bottom)/2; // dragged center
-	const dragover = e=>{
-		const over = e.target.closest('li');
-		if (over===dragged) return;
-		e.preventDefault();
-		const oR = over.rect(), oC = (oR.top+oR.bottom)/2;
-		if(oC > dC && e.clientY > oC) {
-			if (over.nextElementSibling) list.insertBefore(dragged, over.nextElementSibling)
-			else list.appendChild(dragged)
-			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
-		} else if (oC < dC && e.clientY < oC) {
-			list.insertBefore(dragged, over);
-			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
+	updateState(state){// setState and update history
+		this.setState(state);
+		const {todos=this.state.todos}=state, h = this.history[this.historyI];
+		if (h.some((hi,i)=>hi!==todos[i])){
+			this.history = [todos].concat(this.history.slice(this.historyI));
+			this.historyI = 0;
 		}
+	},
 
-	};
-	const drop = e=>{
-		list.removeEventListener('dragover', dragover);
-		list.removeEventListener('dragend', drop);
-		list.removeEventListener('drop', drop);
+	undo(e){
+		if (this.historyI<this.history.length-1){
+			this.setState({todos: this.history[++this.historyI]});
+		}
+	},
+	redo(e){
+		if (this.historyI>0){
+			this.setState({todos: this.history[--this.historyI]});
+		}
+	},
+	add(){
+		this.updateState({todos:[{name:'New todo #'+(this.state.todos.length+1), time: new Date()}].concat(this.state.todos)})
+	},
+	trash(){
+		this.updateState({todos:this.state.todos.filter(t=>!t.checked)})
+	},
+	sortByName(){
+		this.updateState({todos:this.state.todos.slice().sort((a,b)=>(a.name>b.name)-.5)})
+	},
+	sortByTime(){
+		this.updateState({todos:this.state.todos.slice().sort((a,b)=>(a.time<b.time)-.5)})
+	},
+	blur(e, todo){
+		if (todo.name!==e.target.textContent){
+			const {todos} = this.state;
+			todos.splice(todos.indexOf(todo),1,Object.assign({},todo,{name:e.target.textContent}))
+			this.updateState({todos:this.state.todos.slice()});
+			console.log('save on blut');
+		}
+	},
+
+	dragOver(e, todo){
+		if (todo===this.state.dragged) return;
+		e.preventDefault();
+		const {top, bottom} = e.currentTarget.rect(), oC = (top+bottom)/2;
+		if(oC > this.dC && e.clientY > oC) {
+			const todos = this.state.todos.slice();
+			todos.splice(todos.indexOf(this.state.dragged),1)
+			todos.splice(todos.indexOf(todo)+1,0,this.state.dragged)
+			this.setState({todos});
+		} else if (oC < this.dC && e.clientY < oC) {
+			const todos = this.state.todos.slice();
+			todos.splice(todos.indexOf(this.state.dragged),1)
+			todos.splice(todos.indexOf(todo),0,this.state.dragged)
+			this.setState({todos});
+		}
+	},
+	dragStart(e, todo){
+		this.setState({dragged:todo});
+	},
+	dragEnd(e){
+		const {dragged}=this.state;
+		this.updateState({dragged:null});
+	},
+
+	componentDidUpdate(p,s){ // we must keep track of dragged elements position, so a nasty side-effect
+		if (this.state.dragged){
+			const i=this.state.todos.indexOf(this.state.dragged),
+				el=this.refs.list.children[i],
+				{top, bottom} = el.rect();
+			this.dC = (top+bottom)/2;
+		}
+	},
+
+	render(){
+		const {todos, dragged} = this.state;
+		return v('div',
+			v('div', {className:'buttons'},
+				v('div',
+					v('button', {disabled:this.historyI===this.history.length-1, onClick:this.undo}, v('i', {className:'fa fa-mail-reply'})),
+					v('button', {disabled:this.historyI===0, onClick:this.redo}, v('i', {className:'fa fa-mail-forward'}))
+				),
+				v('div',
+					v('button', {title: 'Add a todo', onClick: this.add}, v('i', {className:'fa fa-plus'})),
+					v('button', {title: 'Sort by name', onClick:this.sortByName}, v('i', {className:'fa fa-sort-alpha-asc'})),
+					v('button', {title: 'Sort by date', onClick:this.sortByTime}, v('i', {className:'fa fa-sort-amount-asc'})),
+					v('button', {title: 'Clear completed', onClick:this.trash}, v('i', {className:'fa fa-trash-o'}))
+				)
+			),
+			v('ol', {ref:'list', onDragEnd:dragged&&this.dragEnd},
+				todos.map((todo, key)=>
+					v('li', {key, draggable:true, 
+							onDragStart:e=>this.dragStart(e,todo), 
+							onDragOver:dragged&&(e=>this.dragOver(e,todo)),
+							style:dragged&&dragged===todo?{opacity:.5}:null
+						},
+						v('label',
+							v('input', {type:'checkbox', onChange:e=>{todo.checked=e.target.checked; this.setState({todos:todos.slice()})}, checked:Boolean(todo.checked)}),
+							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,todo)}),
+							v('time', todo.time.toLocaleString())
+						)
+					)
+				)
+			)
+		)
 	}
 
-	list.addEventListener('dragover', dragover);
-	list.addEventListener('dragend', drop);
-	list.addEventListener('drop', drop);
-
-
-	// console.log('ds', e.target);
-	// e.dataTransfer.setDragImage(frag, e.clientX-e.target.offsetLeft, e.clientY-e.target.offsetY)
 })
 
 
-list.addEventListener('click', e=>{
-	if (e.target.isContentEditable) {
-		e.stopPropagation();
-		e.preventDefault();
-	} 
-})
-
-
-
+// initial Todos list
 const todos = [{
 	name: 'Reply to John',
 	time: new Date(Date.now()-36*3.6e6)
@@ -84,40 +145,11 @@ const todos = [{
 	time: new Date(Date.now()-4*3.6e6)
 }];
 
-const Todo = ({name, time}) => h('li', {draggable: true, data:{time:time.getTime()}},
-		h('label',
-			h('input', {type:'checkbox'}),
-			h('span', {contentEditable:true}, name),
-			h('time', time.toLocaleString())
-		)
-	);
-
-
-// init Todo List
-for (let todo of todos)
-	list.appendChild(Todo(todo))
-
+ReactDOM.render(v(Todos, {todos}), todoapp)
 
 
 
 // DOM utils
-
-function h(tag, p, ...children){ // 'hyperscript' util function, to make quickly DOM elements
-	if (p instanceof Node||typeof p==='string'||Array.isArray(p)) return h(tag, null, p, ...children);
-	const el=document.createElement(tag);
-	if (p){
-		Object.assign(el, p);
-		if (p.style) Object.assign(el.style, p.style);
-		if (p.data) for (let i in p.data) el.dataset[i]=p.data[i];
-		for (let name in p){
-			if (name.startsWith('on') && p[name])
-				el.addEventListener(name.substring(2).toLowerCase(), p[name], true); // or el[name.toLowerCase()] = p[name];
-		}
-	}
-	[].concat(...children.map(c=>typeof c==='string'?document.createTextNode(c):c))// flatten a list of children, and make text nodes when needed
-	.forEach(c=>el.appendChild(c)) // and append them to el
-	return el;
-}
 
 Element.prototype.rect = Element.prototype.getBoundingClientRect;
 Text.prototype.closest = function(s) {
