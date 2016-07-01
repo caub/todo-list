@@ -43,16 +43,13 @@ input[type=checkbox]:checked ~ * {
 }
 
 span[contenteditable] {
-	white-space: nowrap;
 	display: inline-block;
 	vertical-align: middle;
 	min-width: 2em;
-	padding: .8rem;
-	margin-left: .8rem;
 	cursor: text;
 	flex: 1;
 }
-time {padding: .8rem .4rem;}
+time, span {padding: .8rem .4rem; cursor:move}
 
 button {
 	border: none;

@@ -1,6 +1,5 @@
 // Simple Todo implementation in pure JavaScript, next step will be to use React to organize and simplify it
 
-
 const {add, name, date, trash} = modify.elements;
 
 modify.addEventListener('submit', e=>{
@@ -34,9 +33,9 @@ add.addEventListener('click', e=>{
 list.addEventListener('dragstart', e=>{
 	let dragged = e.target.closest('li'), dR = dragged.rect(), dC = (dR.top+dR.bottom)/2; // dragged center
 	const dragover = e=>{
+		e.preventDefault();
 		const over = e.target.closest('li');
 		if (over===dragged) return;
-		e.preventDefault();
 		const oR = over.rect(), oC = (oR.top+oR.bottom)/2;
 		if(oC > dC && e.clientY > oC) {
 			if (over.nextElementSibling) list.insertBefore(dragged, over.nextElementSibling)
@@ -86,6 +85,7 @@ const todos = [{
 
 const Todo = ({name, time}) => h('li', {draggable: true, data:{time:time.getTime()}},
 		h('label',
+			h('span', '☰'),
 			h('input', {type:'checkbox'}),
 			h('span', {contentEditable:true}, name),
 			h('time', time.toLocaleString())
