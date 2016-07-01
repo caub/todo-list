@@ -27,7 +27,7 @@ const Todos = React.createClass({
 	updateState(state){// setState and update history
 		this.setState(state);
 		const {todos=this.state.todos}=state, h = this.history[this.historyI];
-		if (h.some((hi,i)=>hi!==todos[i])){
+		if (h.length!==todos.length || h.some((hi,i)=>hi!==todos[i])){
 			this.history = [todos].concat(this.history.slice(this.historyI));
 			this.historyI = 0;
 		}
@@ -57,16 +57,15 @@ const Todos = React.createClass({
 	},
 	blur(e, todo){
 		if (todo.name!==e.target.textContent){
-			const {todos} = this.state;
+			const todos = this.state.todos.slice();
 			todos.splice(todos.indexOf(todo),1,Object.assign({},todo,{name:e.target.textContent}))
-			this.updateState({todos:this.state.todos.slice()});
-			console.log('save on blut');
+			this.updateState({todos});
 		}
 	},
 
 	dragOver(e, todo){
-		if (todo===this.state.dragged) return;
 		e.preventDefault();
+		if (todo===this.state.dragged) return;
 		const {top, bottom} = e.currentTarget.rect(), oC = (top+bottom)/2;
 		if(oC > this.dC && e.clientY > oC) {
 			const todos = this.state.todos.slice();
