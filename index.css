@@ -32,8 +32,9 @@ ol {
 	position: relative;
 }
 li {
+	position: absolute;
 	width: 100%;
-	/*transition: all .5s ease-in-out*/;
+	transition: all .3s ease-in-out;
 }
 
 li > label {

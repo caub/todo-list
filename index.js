@@ -7,11 +7,17 @@ const v = (tag='div', p, ...children) =>
 		React.createElement(tag, undefined, p, ...children) :
 		React.createElement(tag, p, ...children);
 
+function equals(o, o2){ //object equal only, and assume same keys
+	for (var i in o)
+		if (o[i]!==o2[i]) return false;
+	return true;
+}
+
 
 const Todos = React.createClass({
 
 	shouldComponentUpdate(p, s){
-		return s.todos!==this.state.todos || s.dragged!==this.state.dragged;
+		return !equals(s, this.state);
 	},
 
 	getInitialState(){
@@ -88,12 +94,21 @@ const Todos = React.createClass({
 		this.dC = (top+bottom)/2;
 	},
 	dragEnd(e){
-		const {dragged}=this.state;
 		this.updateState({dragged:null});
 		this.dE = null;
 	},
 
+	componentDidMount(){
+		this.forceUpdate()
+	},
+
 	componentDidUpdate(p,s){ // we must keep track of dragged elements position, so a nasty side-effect
+		let y=0;
+		for (let el of this.refs.list.children){
+			el.style.transform = `translateY(${y}px)`;
+			y+=el.offsetHeight;
+		}
+		this.refs.list.style.height = y+'px';
 		if (this.dE){
 			const {top, bottom} = this.dE.rect();
 			this.dC = (top+bottom)/2;
@@ -102,7 +117,6 @@ const Todos = React.createClass({
 
 	render(){
 		const {todos, dragged} = this.state;
-		//const pos = dragged && Array.prototype.reduce.call(this.refs.list.children, (a,c)=>a.concat(a[a.length-1]+c.offsetHeight), [0])
 		return v('div',
 			v('div', {className:'buttons'},
 				v('div',
@@ -116,12 +130,12 @@ const Todos = React.createClass({
 					v('button', {title: 'Clear completed', onClick:this.trash}, v('i', {className:'fa fa-trash-o'}))
 				)
 			),
-			v('ol', {ref:'list', onDragEnd:dragged&&this.dragEnd},
-				todos.map(todo=>
+			v('ol', {ref:'list', onDrop:dragged&&this.dragEnd, onDragEnd:dragged&&this.dragEnd},
+				todos.map((todo,i)=>
 					v('li', {key:todo.id, draggable:true, 
 							onDragStart:e=>this.dragStart(e,todo), 
 							onDragOver:dragged&&(e=>this.dragOver(e,todo)),
-							style:dragged?{/*position:'absolute', transform:`translateY(${pos[key]}px)`/*, transition:'transform .5s ease-in-out', */opacity:dragged===todo?.6:1}:null
+							style: {opacity:dragged===todo?.6:1}
 						},
 						v('label',
 							v('span', '☰'),
