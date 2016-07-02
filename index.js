@@ -11,6 +11,7 @@ name.addEventListener('click', e=>{
 	items.sort((a,b)=>a.textContent>b.textContent);
 	for (let item of items)
 		list.appendChild(item);
+	update(list)
 })
 
 date.addEventListener('click', e=>{
@@ -18,42 +19,50 @@ date.addEventListener('click', e=>{
 	items.sort((a,b)=>+b.dataset.time-a.dataset.time);
 	for (let item of items)
 		list.appendChild(item);
+	update(list)
 })
 
 trash.addEventListener('click', e=>{
 	Array.from(list.children)
 		.filter(li=>li.querySelector('input').checked)
 		.forEach(li=>li.remove());
+	update(list)
 })
 
 add.addEventListener('click', e=>{
 	list.appendChild(Todo({name:'New todo #'+list.childElementCount, time: new Date()}))
+	update(list)
 })
 
 list.addEventListener('dragstart', e=>{
 	let dragged = e.target.closest('li'), dR = dragged.rect(), dC = (dR.top+dR.bottom)/2; // dragged center
 	const dragover = e=>{
 		e.preventDefault();
-		const over = e.target.closest('li');
+		const over = e.currentTarget;
 		if (over===dragged) return;
 		const oR = over.rect(), oC = (oR.top+oR.bottom)/2;
 		if(oC > dC && e.clientY > oC) {
 			if (over.nextElementSibling) list.insertBefore(dragged, over.nextElementSibling)
 			else list.appendChild(dragged)
+			update(list)
 			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
 		} else if (oC < dC && e.clientY < oC) {
 			list.insertBefore(dragged, over);
+			update(list)
 			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
 		}
 
 	};
 	const drop = e=>{
-		list.removeEventListener('dragover', dragover);
+		console.log(e.type);
+		for (let el of list.children)
+			el.removeEventListener('dragover', dragover);
 		list.removeEventListener('dragend', drop);
 		list.removeEventListener('drop', drop);
 	}
 
-	list.addEventListener('dragover', dragover);
+	for (let el of list.children)
+			el.addEventListener('dragover', dragover);
 	list.addEventListener('dragend', drop);
 	list.addEventListener('drop', drop);
 
@@ -96,6 +105,16 @@ const Todo = ({name, time}) => h('li', {draggable: true, data:{time:time.getTime
 // init Todo List
 for (let todo of todos)
 	list.appendChild(Todo(todo))
+
+update(list)
+function update(list){
+	let y=0;
+	for (let el of list.children){
+		el.style.transform = `translateY(${y}px)`;
+		y+=el.offsetHeight;
+	}
+	list.style.height = y+'px';
+}
 
 
 

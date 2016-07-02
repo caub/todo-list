@@ -23,6 +23,12 @@ ol {
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	position: relative;
+}
+li {
+	position: absolute;
+	width: 100%;
+	transition: transform .3s ease-in-out;
 }
 li > label {
 	background-color: #eee;
@@ -49,7 +55,11 @@ span[contenteditable] {
 	cursor: text;
 	flex: 1;
 }
-time, span {padding: .8rem .4rem; cursor:move}
+span:first-of-type {
+	padding: .6rem .4rem 1rem;
+	cursor:move;
+}
+time, span {padding: .8rem .4rem;}
 
 button {
 	border: none;
