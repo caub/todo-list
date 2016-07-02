@@ -1,4 +1,5 @@
 // in React, with undo/redo. Next step is to modularize and separate concerns (create a component TodoList for the list, Sortable for the sorting behaviour), and require modules
+// todo make transitions during sort and drag
 
 // main React util
 const v = (tag='div', p, ...children) =>
@@ -44,7 +45,8 @@ const Todos = React.createClass({
 		}
 	},
 	add(){
-		this.updateState({todos:[{name:'New todo #'+(this.state.todos.length+1), time: new Date()}].concat(this.state.todos)})
+		const {todos}=this.state;
+		this.updateState({todos:[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos)})
 	},
 	trash(){
 		this.updateState({todos:this.state.todos.filter(t=>!t.checked)})
@@ -58,7 +60,7 @@ const Todos = React.createClass({
 	blur(e, todo){
 		if (todo.name!==e.target.textContent){
 			const todos = this.state.todos.slice();
-			todos.splice(todos.indexOf(todo),1,Object.assign({},todo,{name:e.target.textContent}))
+			todos.splice(todos.indexOf(todo),1,Object.assign({},todo,{name:e.target.innerHTML}))
 			this.updateState({todos});
 		}
 	},
@@ -81,23 +83,26 @@ const Todos = React.createClass({
 	},
 	dragStart(e, todo){
 		this.setState({dragged:todo});
+		const {top, bottom} = e.currentTarget.rect();
+		this.dE = e.currentTarget;
+		this.dC = (top+bottom)/2;
 	},
 	dragEnd(e){
 		const {dragged}=this.state;
 		this.updateState({dragged:null});
+		this.dE = null;
 	},
 
 	componentDidUpdate(p,s){ // we must keep track of dragged elements position, so a nasty side-effect
-		if (this.state.dragged){
-			const i=this.state.todos.indexOf(this.state.dragged),
-				el=this.refs.list.children[i],
-				{top, bottom} = el.rect();
+		if (this.dE){
+			const {top, bottom} = this.dE.rect();
 			this.dC = (top+bottom)/2;
 		}
 	},
 
 	render(){
 		const {todos, dragged} = this.state;
+		//const pos = dragged && Array.prototype.reduce.call(this.refs.list.children, (a,c)=>a.concat(a[a.length-1]+c.offsetHeight), [0])
 		return v('div',
 			v('div', {className:'buttons'},
 				v('div',
@@ -112,13 +117,14 @@ const Todos = React.createClass({
 				)
 			),
 			v('ol', {ref:'list', onDragEnd:dragged&&this.dragEnd},
-				todos.map((todo, key)=>
-					v('li', {key, draggable:true, 
+				todos.map(todo=>
+					v('li', {key:todo.id, draggable:true, 
 							onDragStart:e=>this.dragStart(e,todo), 
 							onDragOver:dragged&&(e=>this.dragOver(e,todo)),
-							style:dragged&&dragged===todo?{opacity:.5}:null
+							style:dragged?{/*position:'absolute', transform:`translateY(${pos[key]}px)`/*, transition:'transform .5s ease-in-out', */opacity:dragged===todo?.6:1}:null
 						},
 						v('label',
+							v('span', '☰'),
 							v('input', {type:'checkbox', onChange:e=>{todo.checked=e.target.checked; this.setState({todos:todos.slice()})}, checked:Boolean(todo.checked)}),
 							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,todo)}),
 							v('time', todo.time.toLocaleString())
@@ -134,13 +140,13 @@ const Todos = React.createClass({
 
 // initial Todos list
 const todos = [{
-	name: 'Reply to John',
+	id:1, name: 'Reply to John',
 	time: new Date(Date.now()-36*3.6e6)
 }, {
-	name: 'Clean home',
+	id:2, name: 'Clean home',
 	time: new Date(Date.now()-96*3.6e6)
 }, {
-	name: 'Fix issue buffer leak #77',
+	id:3, name: 'Fix issue buffer leak #77',
 	time: new Date(Date.now()-4*3.6e6)
 }];
 

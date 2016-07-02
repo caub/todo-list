@@ -29,7 +29,13 @@ ol {
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	position: relative;
 }
+li {
+	width: 100%;
+	/*transition: all .5s ease-in-out*/;
+}
+
 li > label {
 	background-color: #eee;
 	display: block;
@@ -48,17 +54,19 @@ input[type=checkbox]:checked ~ * {
 	text-decoration: line-through;
 }
 
+
 span[contenteditable] {
-	white-space: nowrap;
 	display: inline-block;
 	vertical-align: middle;
 	min-width: 2em;
-	padding: .8rem;
-	margin-left: .8rem;
 	cursor: text;
 	flex: 1;
 }
-time {padding: .8rem .4rem;}
+span:first-of-type {
+	padding: .6rem .4rem 1rem;
+	cursor:move;
+}
+time, span {padding: .8rem .4rem;}
 
 button {
 	border: none;
