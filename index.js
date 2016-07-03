@@ -36,6 +36,7 @@ add.addEventListener('click', e=>{
 
 list.addEventListener('dragstart', e=>{
 	let dragged = e.target.closest('li'), dR = dragged.rect(), dC = (dR.top+dR.bottom)/2; // dragged center
+	e.dataTransfer.setData('text/custom', 'sort');
 	const dragover = e=>{
 		e.preventDefault();
 		const over = e.currentTarget;
