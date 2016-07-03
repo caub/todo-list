@@ -92,6 +92,7 @@ const Todos = React.createClass({
 		const {top, bottom} = e.currentTarget.rect();
 		this.dE = e.currentTarget;
 		this.dC = (top+bottom)/2;
+		e.dataTransfer.setData('text/custom', 'sort');
 	},
 	dragEnd(e){
 		this.updateState({dragged:null});
