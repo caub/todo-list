@@ -1,17 +1,4 @@
-// in React, with undo/redo. Next step is to modularize and separate concerns (create a component TodoList for the list, Sortable for the sorting behaviour), and require modules
-// todo make transitions during sort and drag
-
-// main React util
-const v = (tag='div', p, ...children) =>
-	!p || React.isValidElement(p)||typeof p==='string'||Array.isArray(p) ?
-		React.createElement(tag, undefined, p, ...children) :
-		React.createElement(tag, p, ...children);
-
-function equals(o, o2){ //object equal only, and assume same keys
-	for (var i in o)
-		if (o[i]!==o2[i]) return false;
-	return true;
-}
+// Next step is to modularize and separate concerns (create a component TodoItem), and require modules
 
 
 const Todos = React.createClass({
@@ -23,11 +10,11 @@ const Todos = React.createClass({
 	getInitialState(){
 
 		this.history = [this.props.todos];
-		this.historyI = 0; // 0 is most recent, length-1 oldest entry
+		this.historyI = 0; // 0 is most recent .. length-1 oldest entry
 
 		return {
 			todos: this.props.todos,
-			dragged: null // todo item being dragged
+			dragI: -1 // index of dragged item
 		};
 	},
 
@@ -38,6 +25,7 @@ const Todos = React.createClass({
 			this.history = [todos].concat(this.history.slice(this.historyI));
 			this.historyI = 0;
 		}
+		
 	},
 
 	undo(e){
@@ -63,61 +51,55 @@ const Todos = React.createClass({
 	sortByTime(){
 		this.updateState({todos:this.state.todos.slice().sort((a,b)=>(a.time<b.time)-.5)})
 	},
-	blur(e, todo){
-		if (todo.name!==e.target.textContent){
-			const todos = this.state.todos.slice();
-			todos.splice(todos.indexOf(todo),1,Object.assign({},todo,{name:e.target.innerHTML}))
-			this.updateState({todos});
-		}
+	blur(e, i){
+		const {todos} = this.state;
+		if (todos[i].name==e.target.textContent) return;
+		const todos2 = todos.slice(0,i)
+			.concat(Object.assign({},todos[i],{name:e.target.innerHTML}))
+			.concat(todos.slice(i+1));
+		this.updateState({todos:todos2});
 	},
 
-	dragOver(e, todo){
+	dragOver(e, i){
 		e.preventDefault();
-		if (todo===this.state.dragged) return;
-		const {top, bottom} = e.currentTarget.rect(), oC = (top+bottom)/2;
-		if(oC > this.dC && e.clientY > oC) {
-			const todos = this.state.todos.slice();
-			todos.splice(todos.indexOf(this.state.dragged),1)
-			todos.splice(todos.indexOf(todo)+1,0,this.state.dragged)
-			this.setState({todos});
-		} else if (oC < this.dC && e.clientY < oC) {
-			const todos = this.state.todos.slice();
-			todos.splice(todos.indexOf(this.state.dragged),1)
-			todos.splice(todos.indexOf(todo),0,this.state.dragged)
-			this.setState({todos});
-		}
+		const {dragI, todos} = this.state;
+		if (dragI===i) return;
+		const {top, bottom} = e.currentTarget.rect(),
+			center = (top+bottom)/2;
+		
+		if (i===dragI+1 && e.clientY < center || i===dragI-1 && e.clientY > center) return;
+
+		const todos2 = todos.slice(0,dragI).concat(todos.slice(dragI+1)); // removing dragI
+		const i2 = i - (dragI<i) + (e.clientY > center); // if dragI was before, we need to remove 1, if we drag after the center we add 1
+		const todos3 = todos2.slice(0,i2).concat(todos[dragI]).concat(todos2.slice(i2));
+		this.setState({todos:todos3, dragI:i2})
 	},
-	dragStart(e, todo){
-		this.setState({dragged:todo});
-		const {top, bottom} = e.currentTarget.rect();
-		this.dE = e.currentTarget;
-		this.dC = (top+bottom)/2;
+	dragStart(e, i){
+		this.setState({dragI:i});
 		e.dataTransfer.setData('text/custom', 'sort');
 	},
 	dragEnd(e){
-		this.updateState({dragged:null});
-		this.dE = null;
+		this.updateState({dragI:-1});
 	},
 
 	componentDidMount(){
-		this.forceUpdate()
+		this.updateHeights();
 	},
-
-	componentDidUpdate(p,s){ // we must keep track of dragged elements position, so a nasty side-effect
+	componentDidUpdate(){
+		this.updateHeights();
+	},
+	updateHeights(){
 		let y=0;
 		for (let el of this.refs.list.children){
 			el.style.transform = `translateY(${y}px)`;
 			y+=el.offsetHeight;
 		}
 		this.refs.list.style.height = y+'px';
-		if (this.dE){
-			const {top, bottom} = this.dE.rect();
-			this.dC = (top+bottom)/2;
-		}
 	},
 
 	render(){
-		const {todos, dragged} = this.state;
+		const {todos, dragI} = this.state;
+		
 		return v('div',
 			v('div', {className:'buttons'},
 				v('div',
@@ -131,17 +113,17 @@ const Todos = React.createClass({
 					v('button', {title: 'Clear completed', onClick:this.trash}, v('i', {className:'fa fa-trash-o'}))
 				)
 			),
-			v('ol', {ref:'list', onDrop:dragged&&this.dragEnd, onDragEnd:dragged&&this.dragEnd},
+			v('ol', {ref:'list', onDrop:dragI>=0&&this.dragEnd, onDragEnd:dragI>=0&&this.dragEnd, onKeyUp:this.updateHeights},
 				todos.map((todo,i)=>
 					v('li', {key:todo.id, draggable:true, 
-							onDragStart:e=>this.dragStart(e,todo), 
-							onDragOver:dragged&&(e=>this.dragOver(e,todo)),
-							style: {opacity:dragged===todo?.6:1}
+							onDragStart:e=>this.dragStart(e,i), 
+							onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
+							style: {opacity:dragI===i?.6:1}
 						},
 						v('label',
 							v('span', '☰'),
 							v('input', {type:'checkbox', onChange:e=>{todo.checked=e.target.checked; this.setState({todos:todos.slice()})}, checked:Boolean(todo.checked)}),
-							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,todo)}),
+							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,i), onFocus:this.focus}),
 							v('time', todo.time.toLocaleString())
 						)
 					)
@@ -169,9 +151,17 @@ ReactDOM.render(v(Todos, {todos}), todoapp)
 
 
 
-// DOM utils
+// a few utils 
+function v (tag, p, ...children){
+	return !p || React.isValidElement(p)||typeof p==='string'||Array.isArray(p) ?
+		React.createElement(tag, undefined, p, ...children) :
+		React.createElement(tag, p, ...children);
+}
+
+function equals(o, o2){ //object equal only, and assume same keys
+	for (var i in o)
+		if (o[i]!==o2[i]) return false;
+	return true;
+}
 
 Element.prototype.rect = Element.prototype.getBoundingClientRect;
-Text.prototype.closest = function(s) {
-	return this.parentNode.closest(s);
-};
