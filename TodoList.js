@@ -66,7 +66,7 @@ module.exports = React.createClass({
 				v('li', {key:todo.id, draggable:true, 
 						onDragStart:e=>this.dragStart(e,i), 
 						onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
-						style: {opacity:dragI===i?.6:1}
+						style: {opacity:dragI===i?.5:1}
 					},
 					v('label',
 						v('span', '☰'),
