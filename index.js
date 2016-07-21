@@ -1,5 +1,5 @@
 // Next step is to modularize and separate concerns (split in components TodoItem, TodoMenu,.., isolate actions), and require modules
-
+const {v, equals, updateHeights, updateTodos} = require('./utils.js');
 
 const Todos = React.createClass({
 
@@ -80,18 +80,10 @@ const Todos = React.createClass({
 	},
 
 	componentDidMount(){
-		this.updateHeights();
+		updateHeights(this.refs.list);
 	},
 	componentDidUpdate(){
-		this.updateHeights();
-	},
-	updateHeights(){
-		let y=0;
-		for (let el of this.refs.list.children){
-			el.style.transform = `translateY(${y}px)`;
-			y+=el.offsetHeight;
-		}
-		this.refs.list.style.height = y+'px';
+		updateHeights(this.refs.list);
 	},
 
 	render(){
@@ -110,7 +102,7 @@ const Todos = React.createClass({
 					v('button', {title: 'Clear completed', onClick:this.trash}, v('i', {className:'fa fa-trash-o'}))
 				)
 			),
-			v('ol', {ref:'list', onDrop:dragI>=0&&this.dragEnd, onDragEnd:dragI>=0&&this.dragEnd, onKeyUp:this.updateHeights},
+			v('ol', {ref:'list', onDrop:dragI>=0&&this.dragEnd, onDragEnd:dragI>=0&&this.dragEnd, onKeyUp:e=>updateHeights(e.currentTarget)},
 				todos.map((todo,i)=>
 					v('li', {key:todo.id, draggable:true, 
 							onDragStart:e=>this.dragStart(e,i), 
@@ -131,13 +123,6 @@ const Todos = React.createClass({
 });
 
 
-// update todos action
-const updateTodos = (todos, i, todo) => // updates todos i-th item with todo
-	todos.slice(0,i)
-			.concat(Object.assign({},todos[i],todo))
-			.concat(todos.slice(i+1))
-
-
 
 // initial Todos list
 const todos = [{
@@ -155,17 +140,4 @@ ReactDOM.render(v(Todos, {todos}), todoapp)
 
 
 
-// a few utils 
-function v (tag, p, ...children){
-	return !p || React.isValidElement(p)||typeof p==='string'||Array.isArray(p) ?
-		React.createElement(tag, undefined, p, ...children) :
-		React.createElement(tag, p, ...children);
-}
 
-function equals(o, o2){ //object equal only, and assume same keys
-	for (var i in o)
-		if (o[i]!==o2[i]) return false;
-	return true;
-}
-
-Element.prototype.rect = Element.prototype.getBoundingClientRect;
