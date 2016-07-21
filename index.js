@@ -1,4 +1,4 @@
-// Next step is to modularize and separate concerns (create a component TodoItem), and require modules
+// Next step is to modularize and separate concerns (split in components TodoItem, TodoMenu,.., isolate actions), and require modules
 
 
 const Todos = React.createClass({
@@ -53,11 +53,8 @@ const Todos = React.createClass({
 	},
 	blur(e, i){
 		const {todos} = this.state;
-		if (todos[i].name==e.target.textContent) return;
-		const todos2 = todos.slice(0,i)
-			.concat(Object.assign({},todos[i],{name:e.target.innerHTML}))
-			.concat(todos.slice(i+1));
-		this.updateState({todos:todos2});
+		if (todos[i].name==e.target.textContent) return; // nothing changed
+		this.updateState({todos: updateTodos(todos,i,{name:e.target.innerHTML})});
 	},
 
 	dragOver(e, i){
@@ -122,8 +119,8 @@ const Todos = React.createClass({
 						},
 						v('label',
 							v('span', '☰'),
-							v('input', {type:'checkbox', onChange:e=>{todo.checked=e.target.checked; this.setState({todos:todos.slice()})}, checked:Boolean(todo.checked)}),
-							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,i), onFocus:this.focus}),
+							v('input', {type:'checkbox', onChange:e=>this.updateState({todos:updateTodos(todos,i,{checked:e.target.checked})}), checked:Boolean(todo.checked)}),
+							v('span', {contentEditable:true, dangerouslySetInnerHTML:{__html:todo.name}, onClick:e=>e.preventDefault(), onBlur:e=>this.blur(e,i)}),
 							v('time', todo.time.toLocaleString())
 						)
 					)
@@ -131,8 +128,15 @@ const Todos = React.createClass({
 			)
 		)
 	}
+});
 
-})
+
+// update todos action
+const updateTodos = (todos, i, todo) => // updates todos i-th item with todo
+	todos.slice(0,i)
+			.concat(Object.assign({},todos[i],todo))
+			.concat(todos.slice(i+1))
+
 
 
 // initial Todos list
