@@ -9,6 +9,7 @@ module.exports = React.createClass({
 		return {todos: undefined, dragI: -1}; // local state, serves during dragging
 	},
 
+	// Next step is to isolate those actions/logic below in a module
 	updateTodo(i, todo){
 		const {todos} = this.props;
 		if (todo.name && todo.name==todos[i].name) return; // nothing changed
@@ -86,4 +87,4 @@ module.exports = React.createClass({
 			)
 		);
 	}
-})
+});

@@ -1,6 +1,5 @@
-// Next step is to modularize and separate concerns (split in components TodoItem, TodoMenu,.., isolate actions), and require modules
 const TodoApp = require('./TodoApp.js')
-const {v, equals} = require('./utils.js');
+const {v} = require('./utils.js');
 
 
 // initial Todos list for testing
