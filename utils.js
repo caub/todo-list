@@ -1,12 +1,6 @@
 
 const React = require('react');
 
-// update todos action
-const updateTodos = (todos, i, todo) => // updates todos i-th item with todo
-	todos.slice(0,i)
-			.concat(Object.assign({},todos[i],todo))
-			.concat(todos.slice(i+1))
-
 
 // react non-jsx util
 function v (tag, p, ...children){
@@ -77,10 +71,6 @@ function updateHeights(list){ // update heights for each <li> item, that are abs
 
 
 module.exports = {
-	// actions
-	updateTodos,
-
-	// utils 
 	v,
 	equals,
 	updateHeights
