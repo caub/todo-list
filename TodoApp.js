@@ -57,10 +57,10 @@ module.exports = React.createClass({
 		
 		return v('div',
 
-			v(TodoMenu, {app:this, historyI, historyLength:history.length}),
+			v(TodoMenu, {updateWith:this.updateWith, undo:this.undo,redo:this.redo, historyI, historyLength:history.length}),
 
-			v(TodoList, {app:this, todos:history[historyI]})
-			
+			v(TodoList, {update:this.update, todos:history[historyI]})
+
 		)
 	}
 });

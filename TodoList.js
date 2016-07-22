@@ -1,4 +1,4 @@
-const {v, equals, updateHeights, splice} = require('./utils.js');
+const {v, equals, updateHeights} = require('./utils.js');
 
 module.exports = React.createClass({
 	shouldComponentUpdate(p, s){
@@ -14,7 +14,7 @@ module.exports = React.createClass({
 		const {todos} = this.props;
 		if (todo.name && todo.name==todos[i].name) return; // nothing changed
 		const todo2 = Object.assign({}, todos[i], todo);
-		this.props.app.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
+		this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
 	},
 
 	dragOver(e, i){
@@ -40,7 +40,7 @@ module.exports = React.createClass({
 	// 	console.log('dropped');
 	// },
 	dragEnd(e){
-		this.props.app.update(this.state.todos);
+		this.props.update(this.state.todos);
 		this.setState({todos:undefined, dragI:-1});
 	},
 
@@ -68,7 +68,7 @@ module.exports = React.createClass({
 						onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
 						style: {opacity:dragI===i?.5:1}
 					},
-					v('label',
+					v('label', // we could create a TodoItem.js for this
 						v('span', '☰'),
 						v('input', {
 							type:'checkbox', 

@@ -6,20 +6,20 @@ module.exports = React.createClass({
 	},
 
 	add(){
-		this.props.app.updateWith(todos=>[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
+		this.props.updateWith(todos=>[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
 	},
 	trash(){
-		this.props.app.updateWith(todos=>todos.filter(t=>!t.checked))
+		this.props.updateWith(todos=>todos.filter(t=>!t.checked))
 	},
 	sortByName(){
-		this.props.app.updateWith(todos=>todos.slice().sort((a,b)=>(a.name>b.name)-.5))
+		this.props.updateWith(todos=>todos.slice().sort((a,b)=>(a.name>b.name)-.5))
 	},
 	sortByTime(){
-		this.props.app.updateWith(todos=>todos.slice().sort((a,b)=>(a.time<b.time)-.5))
+		this.props.updateWith(todos=>todos.slice().sort((a,b)=>(a.time<b.time)-.5))
 	},
 
 	render() {
-		const {historyI, historyLength, app} = this.props;
+		const {historyI, historyLength, undo, redo} = this.props;
 
 		// console.log('render menu', historyI, historyLength);
 
@@ -27,13 +27,13 @@ module.exports = React.createClass({
 			v('div',
 				v('button', {
 						disabled: historyI===historyLength-1,
-						onClick:app.undo
+						onClick: undo
 					}, 
 					v('i', {className:'fa fa-mail-reply'})
 				),
 				v('button', {
 						disabled: historyI===0,
-						onClick:app.redo
+						onClick: redo
 					}, 
 					v('i', {className:'fa fa-mail-forward'})
 				)
