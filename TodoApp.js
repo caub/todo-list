@@ -19,21 +19,25 @@ module.exports = React.createClass({
 	},
 
 	// update/'increment' history with a new todos lists
-	update(todos){
+	update(todos){ // method to update the list of todos
 		// const {todos=this.state.todos}=state, h = this.history[this.historyI];
 		// if (h.length!==todos.length || h.some((hi,i)=>hi!==todos[i])){
 		// ^ commented, make sure to updateState only when you chnaged the content, see blur 
 		const {historyI, history} = this.state;
-		this.setState({historyI:0, history:[todos].concat(history.slice(historyI)), dragI:-1});
+		const todos2 = typeof todos==='function' ? todos(history[historyI]) : todos; // if todos is a function, call it with the previous state
+		// not check quickly if it's really worth updating
+		// take longest between the old one and the new:
+		const [a, b] = todos2.length<history[historyI].length ? [history[historyI],todos2]:[todos2,history[historyI]]; // could .sort too
+
+		if (a.some((ai,i)=>ai!==b[i])) // put a new history entry entry
+			this.setState({historyI:0, history:[todos2].concat(history.slice(historyI)), dragI:-1});
+		else 
+			this.setState({history:Object.assign(history.slice(), {[historyI]:todos2}), dragI:-1});
 		// this.setState( // old  way
 		// 	{todos, historyI:0, dragI},
 		// 	()=>this.history = [this.state].concat(history.slice(historyI)) // could limit history size here // we could use a linkedlist as well
 		// );
 		// }
-	},
-	updateWith(cb) {
-		const {historyI, history} = this.state;
-		this.update(cb(history[historyI]))
 	},
 
 	undo(e){
@@ -57,9 +61,9 @@ module.exports = React.createClass({
 		
 		return v('div',
 
-			v(TodoMenu, {updateWith:this.updateWith, undo:this.undo,redo:this.redo, historyI, historyLength:history.length}),
+			v(TodoMenu, {historyI, historyLength:history.length, update:this.update, undo:this.undo,redo:this.redo}),
 
-			v(TodoList, {update:this.update, todos:history[historyI]})
+			v(TodoList, {todos:history[historyI], update:this.update})
 
 		)
 	}

@@ -10,7 +10,7 @@ module.exports = React.createClass({
 	},
 
 	// Next step is to isolate those actions/logic below in a module
-	updateTodo(i, todo){
+	updateTodo(i, todo){ // update i-th todo item with the object todo
 		const {todos} = this.props;
 		if (todo.name && todo.name==todos[i].name) return; // nothing changed
 		const todo2 = Object.assign({}, todos[i], todo);

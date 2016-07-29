@@ -6,16 +6,16 @@ module.exports = React.createClass({
 	},
 
 	add(){
-		this.props.updateWith(todos=>[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
+		this.props.update(todos=>[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
 	},
 	trash(){
-		this.props.updateWith(todos=>todos.filter(t=>!t.checked))
+		this.props.update(todos=>todos.filter(t=>!t.checked))
 	},
 	sortByName(){
-		this.props.updateWith(todos=>todos.slice().sort((a,b)=>(a.name>b.name)-.5))
+		this.props.update(todos=>todos.slice().sort((a,b)=>(a.name>b.name)-.5))
 	},
 	sortByTime(){
-		this.props.updateWith(todos=>todos.slice().sort((a,b)=>(a.time<b.time)-.5))
+		this.props.update(todos=>todos.slice().sort((a,b)=>(a.time<b.time)-.5))
 	},
 
 	render() {

@@ -41,7 +41,6 @@ li {
 
 li > label {
 	background-color: #eee;
-	display: block;
 	display: flex;
 }
 input:not([type]), input[type=text], li > label > span {
