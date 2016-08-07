@@ -1,5 +1,5 @@
 # todo-list
-Simple todo list for starting in JS
+Simple todo list for hopefully starting in JS ([capture](http://i.imgur.com/G63rTSN.gif))
 
 - branch master: in pure vanilla JS
 - branch gh-pages: in ReactJS
