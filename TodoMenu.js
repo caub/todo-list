@@ -1,4 +1,5 @@
 const {v, equals} = require('./utils.js');
+let tempid = 1;
 
 module.exports = React.createClass({
 	shouldComponentUpdate(p, s){
@@ -6,7 +7,7 @@ module.exports = React.createClass({
 	},
 
 	add(){
-		this.props.update(todos=>[{id:todos.length+1, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
+		this.props.update(todos=>[{id:'_'+tempid++, name:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
 	},
 	trash(){
 		this.props.update(todos=>todos.filter(t=>!t.checked))
