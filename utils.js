@@ -75,6 +75,3 @@ module.exports = {
 	equals,
 	updateHeights
 };
-
-
-Element.prototype.rect = Element.prototype.getBoundingClientRect; // lazy..

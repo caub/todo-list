@@ -6,7 +6,9 @@
 	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
+	<link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
 </head>
+
 <body>
 
 <header>
@@ -22,12 +24,12 @@
 
 <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
 <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
-<script src="https://cdn.rawgit.com/caub/cf82c451120373dc1568/raw/85aaf781f52fe3e28d1a18bfa73ccd6ffd2635a5/main.js"></script>
+<script src="https://cdn.rawgit.com/caub/require/master/require.js"></script>
 <script>
 	require.cache.react = {exports: React};
+	require('./index.js')
 </script>
 
-<script src="index.js"></script>
 
 </body>
 </html>

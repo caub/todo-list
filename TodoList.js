@@ -21,7 +21,7 @@ module.exports = React.createClass({
 		e.preventDefault();
 		const {dragI, todos} = this.state;
 		if (dragI===i) return;
-		const {top, bottom} = e.currentTarget.rect(),
+		const {top, bottom} = e.currentTarget.getBoundingClientRect(),
 			center = (top+bottom)/2;
 		
 		if (i===dragI+1 && e.clientY < center || i===dragI-1 && e.clientY > center) return;
@@ -88,3 +88,5 @@ module.exports = React.createClass({
 		);
 	}
 });
+
+// todo list for completed?
