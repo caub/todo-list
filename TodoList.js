@@ -47,8 +47,10 @@ module.exports = React.createClass({
 	componentDidMount(){
 		updateHeights(this.refs.list);
 	},
-	componentDidUpdate(){
+	componentDidUpdate(p,s){
 		updateHeights(this.refs.list);
+		if (this.props.todos!==p.todos)
+			localStorage.todos = JSON.stringify(this.props.todos);
 	},
 
 	render() { // todos is in priority searched in local state, when it's undefined, we take it in props

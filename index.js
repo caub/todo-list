@@ -3,7 +3,7 @@ const {v} = require('./utils.js');
 
 
 // initial Todos list for testing
-const todos = [{
+const todos = localStorage.todos ? JSON.parse(localStorage.todos) : [{
 	id:1, name: 'Reply to John',
 	time: new Date(Date.now()-36*3.6e6)
 }, {
