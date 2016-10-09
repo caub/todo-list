@@ -15,10 +15,9 @@ header {text-align: center;}
 
 .buttons {
 	display: flex;
+	justify-content: flex-end;
 }
-.buttons > :first-child {
-	flex:1;
-}
+
 button[disabled] {
 	opacity: .1;
 }
@@ -32,45 +31,77 @@ ol {
 	padding: 0;
 	margin: 0;
 	position: relative;
-	transition: all .3s ease-in-out;
 	height:0;
+}
+ol.anim {
+	transition: all .3s ease-in-out;
+}
+ol.anim > li {
+	transition: all .3s ease-in-out;
 }
 li {
 	position: absolute;
 	width: 100%;
-	transition: all .3s ease-in-out;
-}
-
-li > label {
 	background-color: #eee;
 	display: flex;
+	align-items: center;
 }
-input:not([type]), input[type=text], li > label > span {
+
+li:first-child {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+li:last-child {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+input:not([type]), input[type=text], li span {
 	font-size: 1.2em;
 }
 input[type=checkbox] {
-/*	transform: scale(1.2) translateY(2px);
-	transform-origin: 100% 50%;
-	margin-right: .6rem;*/
-	display: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	outline: none;
+	cursor: pointer;
+	line-height: 0;
+	margin: 0 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	border: 1px solid #ccc;
+	transition: all .15s ease-in-out;
+	overflow: hidden;
 }
-input[type=checkbox]:checked ~ * {
-	text-decoration: line-through;
+input[type=checkbox]:before {
+	content: "✓";
+	opacity: 0;
+	transition: all .15s ease-in-out;
+	color: white;
+	font-size: 25px;
+/*	-webkit-clip-path: circle(30px);
+	-moz-clip-path: circle(30px);*/
+}
+input[type=checkbox]:checked {
+	background-color: #16c60c;
+}
+input[type=checkbox]:checked::before {
+	opacity: 1;
 }
 
 
-span[contenteditable] {
-	display: inline-block;
-	vertical-align: middle;
+li > span {
 	min-width: 2em;
-	cursor: text;
+	padding: 1rem;
 	flex: 1;
+	cursor: text;
 }
-span:first-of-type {
-	padding: .6rem .4rem 1rem;
-	cursor:move;
+time {
+	margin: 0 6px;
 }
-time, span {padding: .8rem .4rem;}
+
 
 button {
 	border: none;
