@@ -1,7 +1,7 @@
 const React = require('react');
 const v = React.createElement;
 
-const maxId = todos => Math.max(...todos.map(t=>t.id));
+const maxId = todos => Math.max(1, ...todos.map(t=>t.id));
 
 module.exports = class extends React.PureComponent {
 
