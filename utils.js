@@ -15,7 +15,7 @@ function timeago(date) {
 	const now=Date.now(), t=date.getTime();
 	if (now-t<60e3) return 'just now';
 	if (now-t<3600e3) return `${floor((now-t)/60e3)}mn ago`;
-	if (now-t<86400e3) return `${floor((now-t)/3600e3)}hr ago`;
+	if (now-t<86400e3) return `${floor((now-t)/3600e3)}h ago`;
 	const y = floor((now-t)/31536000e3), d = floor((now-t-y*31536000e3)/86400e3);
 	return (y?`${y}y`:'')+(y&&d?' ':'')+(d?`${d}d`:'')+' ago';
 }

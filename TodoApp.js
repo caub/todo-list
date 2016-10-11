@@ -1,6 +1,6 @@
 const React = require('react');
-const TodoMenu = require('./TodoMenu.js');
-const TodoList = require('./TodoList.js');
+const TodoMenu = require('./TodoMenu');
+const TodoList = require('./TodoList');
 const v = React.createElement;
 
 module.exports = class extends React.PureComponent {
@@ -13,7 +13,7 @@ module.exports = class extends React.PureComponent {
 		};
 
 		// update/'increment' history with a new todos lists
-		this.update = (todos, cb) => {
+		this.update = (todos, cb) => { // no top-level class props in JS yet, but it's coming
 			const {historyI, history} = this.state;
 			const todos2 = typeof todos==='function' ? todos(history[historyI]) : todos;
 			// not check quickly if it's really worth updating

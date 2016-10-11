@@ -32,19 +32,16 @@ ol {
 	margin: 0;
 	position: relative;
 	height:0;
-}
-ol.anim {
 	transition: all .3s ease-in-out;
 }
-ol.anim > li {
-	transition: all .3s ease-in-out;
-}
+
 li {
 	position: absolute;
 	width: 100%;
 	background-color: #eee;
 	display: flex;
 	align-items: center;
+	transition: all .3s ease-in-out;
 }
 
 li:first-child {
@@ -55,7 +52,7 @@ li:last-child {
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
 }
-input:not([type]), input[type=text], li span {
+input:not([type]), input[type=text], li div {
 	font-size: 1.2em;
 }
 input[type=checkbox] {
@@ -92,7 +89,7 @@ input[type=checkbox]:checked::before {
 }
 
 
-li > span {
+li > div {
 	min-width: 2em;
 	padding: 1rem;
 	flex: 1;

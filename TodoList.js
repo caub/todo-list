@@ -1,6 +1,7 @@
 const React = require('react');
 const {updateHeights, timeago} = require('./utils.js');
 const v = React.createElement;
+
 const sel = getSelection();
 
 function setRange(r) {
@@ -9,17 +10,17 @@ function setRange(r) {
 }
 const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
 
+
 module.exports = class extends React.PureComponent {
 
 	constructor(props){
 		super(props);
-		this.state = {todos: undefined, dragI: -1, anim:true}; // local state, serves during dragging
+		this.state = {todos: undefined, dragI: -1}; // local state, serves during dragging
+		
 		this.updateTodo=(i, todo)=>{ // update i-th todo item with the object todo
 			const {todos} = this.props;
-			if (todo.name && todo.name==todos[i].name) return; // nothing changed
 			const todo2 = Object.assign({}, todos[i], todo);
-			this.setState({anim: false});
-			this.props.update(Object.assign(todos.slice(), {[i]: todo2}), ()=>this.setState({anim: true})); // make a copy and set todo at i-th position
+			this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
 		};
 
 		this.dragEnd=(e)=>{
@@ -44,7 +45,7 @@ module.exports = class extends React.PureComponent {
 		this.setState({todos:todos3, dragI:i2})
 	}
 	dragStart(e, i){
-		this.setState({dragI:i, todos: this.props.todos, anim:true});
+		this.setState({dragI:i, todos: this.props.todos});
 		e.dataTransfer.setData('text/custom', 'sort');
 	}
 	// drop(e){
@@ -60,14 +61,13 @@ module.exports = class extends React.PureComponent {
 	}
 
 	render() { // todos is in priority searched in local state, when it's undefined, we take it in props
-		const {todos=this.props.todos, dragI, anim} = this.state;
+		const {todos=this.props.todos, dragI} = this.state;
 
-		// console.log('render todo list', anim, this.state.todos, todos);
+		// console.log('render todo list', this.state.todos, todos);
 
 		return v('ol', {
 				ref:'list',
 				// onDrop:dragI>=0&&this.drop,
-				className:anim?'anim':'',
 				onDragEnd:dragI>=0&&this.dragEnd,
 				onKeyUp:e=>updateHeights(e.currentTarget)
 			},
@@ -82,20 +82,21 @@ module.exports = class extends React.PureComponent {
 						onChange:e=>this.updateTodo(i, {checked:e.target.checked}),
 						checked:Boolean(todo.checked)
 					}),
-					v('span', {
-						dangerouslySetInnerHTML:{__html:todo.name},
+					v('div', {
+						dangerouslySetInnerHTML:{__html:todo.text},
 						onMouseDown:e=>{
-							e.target.contentEditable=true;
+							e.currentTarget.contentEditable=true;
 							
-							if (!e.target.contains(getRange().commonAncestorContainer)){
+							if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
 								const r = document.caretRangeFromPoint(e.clientX, e.clientY);
 								setRange(r);
 							}
-							
+							// e.currentTarget.
 						},
 						onBlur:e=>{
-							e.target.contentEditable=false;
-							this.updateTodo(i, {name:e.target.innerHTML, edit:false})
+							e.currentTarget.contentEditable=false;
+							if (e.currentTarget.innerHTML!==todo.text)
+								this.updateTodo(i, {text:e.currentTarget.innerHTML})
 						}
 					}),
 					v('time', null, timeago(todo.time))
