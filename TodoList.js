@@ -56,7 +56,7 @@ module.exports = class extends React.PureComponent {
 	render() { // todos is in priority searched in local state, when it's undefined, we take it in props
 		const {todos=this.props.todos, dragI} = this.state;
 
-		// console.log('render todo list', this.state.todos, todos);
+		// console.log('render todo list', this.state.todos==undefined, ...todos.map((t,i)=>[i, t.text]));
 
 		return v('ol', {
 				ref:'list',
@@ -76,9 +76,8 @@ module.exports = class extends React.PureComponent {
 						checked:Boolean(todo.checked)
 					}),
 					v(TodoItem, {
-						text: todo.text, i, 
-						updateTodo: this.updateTodo,
-						update: text=>console.log('update',i)||this.updateTodo(i,{text})
+						text: todo.text,
+						update: text=>this.updateTodo(i,{text})
 					}),
 					v('time', null, timeago(todo.time))
 				)

@@ -16,8 +16,7 @@ module.exports = class extends React.PureComponent {
 		this.blur = (e, text, i) => {
 			this.setState({edit: false});
 			if (text!==e.currentTarget.innerHTML)
-				props.update(e.currentTarget.innerHTML);
-				// props.updateTodo(i, {text: e.currentTarget.innerHTML});
+				this.props.update(e.currentTarget.innerHTML);
 		};
 		this.mouseDown = e=>{
 			this.setState({edit: true});
