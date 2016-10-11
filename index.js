@@ -1,8 +1,6 @@
 const React = require('react');
 const TodoApp = require('./TodoApp.js')
 
-if (localStorage.todos&&JSON.parse(localStorage.todos).find(t=>t.name))
-	delete localStorage.todos; // old version
 
 // initial Todos list for testing
 const todos = localStorage.todos ? 

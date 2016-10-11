@@ -1,14 +1,7 @@
 const React = require('react');
+const TodoItem = require('./TodoItem');
 const {updateHeights, timeago} = require('./utils.js');
 const v = React.createElement;
-
-const sel = getSelection();
-
-function setRange(r) {
-	sel.removeAllRanges();
-	sel.addRange(r);
-}
-const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
 
 
 module.exports = class extends React.PureComponent {
@@ -82,22 +75,10 @@ module.exports = class extends React.PureComponent {
 						onChange:e=>this.updateTodo(i, {checked:e.target.checked}),
 						checked:Boolean(todo.checked)
 					}),
-					v('div', {
-						dangerouslySetInnerHTML:{__html:todo.text},
-						onMouseDown:e=>{
-							e.currentTarget.contentEditable=true;
-							
-							if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
-								const r = document.caretRangeFromPoint(e.clientX, e.clientY);
-								setRange(r);
-							}
-							// e.currentTarget.
-						},
-						onBlur:e=>{
-							e.currentTarget.contentEditable=false;
-							if (e.currentTarget.innerHTML!==todo.text)
-								this.updateTodo(i, {text:e.currentTarget.innerHTML})
-						}
+					v(TodoItem, {
+						text: todo.text, i, 
+						updateTodo: this.updateTodo,
+						update: text=>console.log('update',i)||this.updateTodo(i,{text})
 					}),
 					v('time', null, timeago(todo.time))
 				)
