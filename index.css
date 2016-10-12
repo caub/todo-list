@@ -81,12 +81,20 @@ input[type=checkbox]:before {
 /*	-webkit-clip-path: circle(30px);
 	-moz-clip-path: circle(30px);*/
 }
+input[type=checkbox]:hover {
+	background-color: rgba(22,198,12,.1);
+}
+input[type=checkbox]:hover::before {
+	opacity: .5;
+}
 input[type=checkbox]:checked {
-	background-color: #16c60c;
+	background-color: rgb(22,198,12);
 }
 input[type=checkbox]:checked::before {
 	opacity: 1;
 }
+
+
 
 
 li > div {
@@ -94,6 +102,7 @@ li > div {
 	padding: 1rem;
 	flex: 1;
 	cursor: text;
+	white-space: pre-wrap;
 }
 time {
 	margin: 0 6px;

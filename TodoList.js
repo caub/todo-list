@@ -31,9 +31,8 @@ module.exports = class extends React.PureComponent {
 		if (dragI===i) return;
 		const {top, bottom} = e.currentTarget.getBoundingClientRect(),
 			// pivot = (bottom+top)/2; // easy way
-			height = e.currentTarget.offsetHeight,
 			dragHeight = this.refs.list.children[dragI].offsetHeight,
-			pivot = dragHeight>=height ? 
+			pivot = dragHeight>=e.currentTarget.offsetHeight ? 
 							(dragI<i ? top : bottom):
 							(dragI<i ? (bottom-dragHeight+top)/2 : (top+dragHeight+bottom)/2);
 		// console.log(dragHeight>=height, dragHeight, height, dragI, i, pivot)

@@ -11,40 +11,46 @@ const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
 module.exports = class extends React.PureComponent {
 	constructor(props) {
 		super(props);
-		this.state = {edit: false};
+		this.state = {text: undefined};
 
-		this.blur = (e, text, i) => {
-			this.setState({edit: false});
-			if (text!==e.currentTarget.innerHTML)
-				this.props.update(e.currentTarget.innerHTML);
+		this.blur = (e, text) => {
+			// const stateText = this.state.text
+			this.setState({text: undefined});
+			// if (text!==e.currentTarget.innerHTML)
+			this.props.update(e.currentTarget.innerHTML);
 		};
-		this.mouseDown = e=>{
-			this.setState({edit: true});
-			if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
-				const r = document.caretRangeFromPoint(e.clientX, e.clientY);
-				setRange(r);
-			}
+		this.focus = e=>{
+			if (this.state.text!==undefined || e.target.tagName=='A') return;
+			const propsText = this.props.text;
+			this.setState({text: propsText});
+			// console.log('focus');
+			this.refs.div.dispatchEvent(new KeyboardEvent('keyup', e))
+			// if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
+			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+			setRange(r);
+			// }
 		};
+		// click on links todo
 	}
 
-	render() {
-		const {text, i} = this.props;
-		return v('div', {
-			contentEditable: this.state.edit,
-			dangerouslySetInnerHTML:{__html: text},
-			onMouseDown:this.mouseDown,
-			onBlur: e=>this.blur(e, text, i)
+	render() { 
+		const stateText = this.state.text, propsText = this.props.text;
+		return v('div', {ref:'div',
+			contentEditable: stateText!==undefined?'plaintext-only':false,
+			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
+			onMouseDown:this.focus,
+			onBlur: this.blur
 		});
 	}
 
 };
 
-// .replace(/`(.+)`/g, '<code>$1</code>')
-// .replace(/\*\*(.+)\*\*/g, '<strong>$1</strong>')
-// .replace(/\*(.+)\*/g, '<em>$1</em>')
-// .replace(/\[(.+)\]\((.+)\)/g, '<a href="$2">$1</a>')
+const markdownToHtml = text => text
+	// .replace(/`(.+)`/g, '<code>$1</code>')
+	.replace(/\*\*(.+)\*\*/g, '<strong>$1</strong>')
+	.replace(/\*(.+)\*/g, '<em>$1</em>')
+	.replace(/\[(.+)\]\((.+)\)/g, '<a href="$2">$1</a>');
 
-// "ok `test` kk **ok** *that's cool* .".replace(/\*\*(.+)\*\*/g, '<strong>$1</strong>')
 
 // v('div', {
 // 	dangerouslySetInnerHTML:{__html:todo.text},
