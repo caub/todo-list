@@ -1,8 +1,11 @@
-const React = require('react');
-const TodoItem = require('./TodoItem');
-const {updateHeights, timeago} = require('./utils.js');
+const [React, TodoItem, {updateHeights, timeago}]  = require('react', './TodoItem', './utils');
 const v = React.createElement;
+const {abs} = Math;
 
+function restorePointerEvents(e){
+	e.currentTarget.removeEventListener('transitionend', restorePointerEvents);
+	e.currentTarget.style.pointerEvents = '';
+}
 
 module.exports = class extends React.PureComponent {
 
@@ -15,7 +18,6 @@ module.exports = class extends React.PureComponent {
 			const todo2 = Object.assign({}, todos[i], todo);
 			this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
 		};
-
 		this.dragEnd=(e)=>{
 			this.props.update(this.state.todos);
 			this.setState({todos:undefined, dragI:-1});
@@ -25,17 +27,25 @@ module.exports = class extends React.PureComponent {
 
 	dragOver(e, i){
 		e.preventDefault();
-		const {dragI, todos} = this.state;
+		const {dragI, todos, transitioning} = this.state;
 		if (dragI===i) return;
 		const {top, bottom} = e.currentTarget.getBoundingClientRect(),
-			center = (top+bottom)/2;
+			// pivot = (bottom+top)/2; // easy way
+			height = e.currentTarget.offsetHeight,
+			dragHeight = this.refs.list.children[dragI].offsetHeight,
+			pivot = dragHeight>=height ? 
+							(dragI<i ? top : bottom):
+							(dragI<i ? (bottom-dragHeight+top)/2 : (top+dragHeight+bottom)/2);
+		// console.log(dragHeight>=height, dragHeight, height, dragI, i, pivot)
 		
-		if (i===dragI+1 && e.clientY < center || i===dragI-1 && e.clientY > center) return;
+		if (i===dragI+1 && e.clientY < pivot || i===dragI-1 && e.clientY > pivot) return;
 
-		const todos2 = todos.slice(0,dragI).concat(todos.slice(dragI+1)); // removing dragI
-		const i2 = i - (dragI<i) + (e.clientY > center); // if dragI was before, we need to remove 1, if we drag after the center we add 1
+		const todos2 = todos.slice(0, dragI).concat(todos.slice(dragI+1)); // removing dragI
+		const i2 = i - (dragI<i) + (e.clientY > pivot); // if dragI was before, we need to remove 1, if we drag after the center we add 1
 		const todos3 = todos2.slice(0,i2).concat(todos[dragI]).concat(todos2.slice(i2));
-		this.setState({todos:todos3, dragI:i2})
+		this.setState({todos:todos3, dragI:i2});
+		e.currentTarget.addEventListener('transitionend', restorePointerEvents);
+		e.currentTarget.style.pointerEvents='none';
 	}
 	dragStart(e, i){
 		this.setState({dragI:i, todos: this.props.todos});

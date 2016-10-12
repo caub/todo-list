@@ -1,5 +1,4 @@
-const React = require('react');
-const TodoApp = require('./TodoApp.js')
+const [React, TodoApp] = require('react', './TodoApp');
 
 
 // initial Todos list for testing

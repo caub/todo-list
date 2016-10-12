@@ -1,6 +1,4 @@
-const React = require('react');
-const TodoMenu = require('./TodoMenu');
-const TodoList = require('./TodoList');
+const [React, TodoMenu, TodoList] = require('react', './TodoMenu', './TodoList');
 const v = React.createElement;
 
 module.exports = class extends React.PureComponent {
