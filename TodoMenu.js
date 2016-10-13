@@ -38,7 +38,7 @@ module.exports = class extends React.PureComponent {
 			v('button', {title: 'Add a todo', onClick: this.add}, v('i', {className:'fa fa-plus'})),
 			v('button', {title: 'Sort by text', onClick:this.sortByText}, v('i', {className:'fa fa-sort-alpha-asc'})),
 			v('button', {title: 'Sort by date', onClick:this.sortByTime}, v('i', {className:'fa fa-sort-amount-asc'})),
-			v('button', {title: 'Clear or drop completed', onClick:this.trash, onDrop:this.drop, onDragOver: e=>e.preventDefault()}, v('i', {className:'fa fa-trash-o'}))
+			v('button', {title: 'Drop completed', onClick:this.trash, onDrop:this.drop, onDragOver: e=>e.preventDefault()}, v('i', {className:'fa fa-trash-o'}))
 		);
 	}
 };

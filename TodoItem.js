@@ -29,7 +29,7 @@ module.exports = class extends React.PureComponent {
 			setRange(r);
 			// }
 		};
-		this.shortCuts = e=>{
+		this.shortcuts = e=>{
 			if (e.ctrlKey && (e.keyCode==66||e.keyCode==73)) { // ctrl+b or ctrl+i
 				const r = getRange();
 				if (r.isCollapsed) return;
@@ -55,7 +55,7 @@ module.exports = class extends React.PureComponent {
 			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
 			onMouseDown:this.focus,
 			onBlur: this.blur
-			// onKeyDown: this.shortCuts
+			// onKeyDown: this.shortcuts
 		});
 	}
 

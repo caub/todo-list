@@ -58,8 +58,6 @@ module.exports = class extends React.PureComponent {
 	componentDidMount(){
 		updateHeights(this.refs.list);
 		window.addEventListener('resize', e=>this.forceUpdate());
-		document.addEventListener('dragend', e=>console.log('dragend doc'));
-		document.addEventListener('drop', e=>console.log('drop doc'));
 	}
 	componentDidUpdate(p,s){
 		updateHeights(this.refs.list);
@@ -72,6 +70,7 @@ module.exports = class extends React.PureComponent {
 
 		return v('ol', {
 				ref:'list',
+				onDragOver: e=>e.preventDefault(),
 				onDrop:dragI>=0&&this.drop,
 				onDragEnd:dragI>=0&&this.dragEnd,
 				onKeyUp:e=>updateHeights(e.currentTarget)
