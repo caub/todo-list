@@ -11,11 +11,11 @@ function updateHeights(list){ // update heights for each <li> item, that are abs
 	list.style.height = y+'px';
 }
 
-function timeago(time) {
-	if (time<60e3) return 'just now';
-	if (time<3600e3) return `${floor(time/60e3)}mn ago`;
-	if (time<86400e3) return `${floor(time/3600e3)}h ago`;
-	const y = floor(time/31536000e3), d = floor((time-y*31536000e3)/86400e3);
+function timeago(time) { // time in minutes
+	if (time<1) return 'just now';
+	if (time<60) return `${floor(time)}' ago`;
+	if (time<1440) return `${floor(time/60)}h ago`;
+	const y = floor(time/525600), d = floor((time-y*525600)/1440);
 	return (y?`${y}y`:'')+(y&&d?' ':'')+(d?`${d}d`:'')+' ago';
 }
 
@@ -70,14 +70,14 @@ function timeago(time) {
 // 	}
 // }
 
-// if (document.caretPositionFromPoint && !document.caretRangeFromPoint){
-// 	document.caretRangeFromPoint = function(x, y) {
-// 		let range = document.caretPositionFromPoint(x,y);
-// 		let r = new Range();
-// 		r.setStart(range.offsetNode, range.offset);
-// 		return r;
-// 	}
-// }
+if (document.caretPositionFromPoint && !document.caretRangeFromPoint){
+	document.caretRangeFromPoint = function(x, y) {
+		let range = document.caretPositionFromPoint(x,y);
+		let r = new Range();
+		r.setStart(range.offsetNode, range.offset);
+		return r;
+	}
+}
 
 
 

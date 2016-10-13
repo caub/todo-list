@@ -21,10 +21,9 @@ module.exports = class extends React.PureComponent {
 		};
 		this.focus = e=>{
 			if (this.state.text!==undefined || e.target.matches('a, a *')) return;
-			const propsText = this.props.text;
-			this.setState({text: propsText});
+			const propsText = this.props.text, evt = new KeyboardEvent('keyup', e);
+			this.setState({text: propsText}, ()=>this.refs.div.dispatchEvent(evt));
 			// console.log('focus');
-			this.refs.div.dispatchEvent(new KeyboardEvent('keyup', e))
 			// if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
 			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
 			setRange(r);
@@ -63,10 +62,10 @@ module.exports = class extends React.PureComponent {
 };
 
 const markdownToHtml = text => text
-	.replace(/`(.+)`/g, '<code>$1</code>')
-	.replace(/\*\*(.+)\*\*/g, '<strong>$1</strong>')
-	.replace(/\*(.+)\*/g, '<em>$1</em>')
-	.replace(/\[(.+)\]\((.+)\)/g, '<a href="$2">$1</a>');
+	.replace(/`([^`]+)`/g, '<code>$1</code>')
+	.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+	.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+	.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 
 
 // v('div', {

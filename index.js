@@ -8,11 +8,16 @@ const todos = localStorage.todos ?
 		id:1, text: 'Reply to **John**',
 		date: new Date(Date.now()-36*3.6e6)
 	}, {
-		id:5, text: "Fix leak/hole in the ceiling", date: new Date(Date.now()-6*86400e3)
+		id:5, text: "Fix leak/hole in the ceiling",
+		date: new Date(Date.now()-6*86400e3)
 	}, {
-		id:4, text: "💻 `delete localStorage.todos` if it's buggy", date: new Date('2016-10-13 12:00')
+		id:4, text: "💻 `delete localStorage.todos` if it's buggy", 
+		date: new Date('2016-10-13 12:00')
 	}, {
-		id:3, text: 'Fix issue wit backticks [#77](https://github.com/caub/todo-list/issues/1)',
+		id:6, text: 'Figure out why *drop* is not always triggered [#2](https://github.com/caub/todo-list/issues/2)',
+		date: new Date('2016-10-13 18:00')
+	}, {
+		id:3, text: 'Issue with backticks [#1](https://github.com/caub/todo-list/issues/1)',
 		date: new Date('2016-10-12 10:00'), checked: true
 	}, {
 		id:2, text: 'Eat a 🍊', checked: true,

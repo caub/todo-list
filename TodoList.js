@@ -1,6 +1,6 @@
-const [React, TodoItem, {updateHeights, timeago}]  = require('react', './TodoItem', './utils');
+const [React, TodoItem, TodoTime, {updateHeights}]  = require('react', './TodoItem', './TodoTime', './utils');
 const v = React.createElement;
-const {abs, log10, exp} = Math;
+const {round} = Math;
 
 function restorePointerEvents(e){
 	e.currentTarget.removeEventListener('transitionend', restorePointerEvents);
@@ -18,8 +18,11 @@ module.exports = class extends React.PureComponent {
 			const todo2 = Object.assign({}, todos[i], todo);
 			this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
 		};
-		this.dragEnd=(e)=>{
+		this.drop=(e)=>{
+			e.preventDefault();
 			this.props.update(this.state.todos);
+		};
+		this.dragEnd=(e)=>{
 			this.setState({todos:undefined, dragI:-1});
 		};
 	}
@@ -47,16 +50,16 @@ module.exports = class extends React.PureComponent {
 		e.currentTarget.style.pointerEvents='none';
 	}
 	dragStart(e, i){
-		this.setState({dragI:i, todos: this.props.todos});
-		e.dataTransfer.setData('text/custom', 'sort');
+		const {todos} = this.props;
+		this.setState({dragI:i, todos});
+		e.dataTransfer.setData('text', JSON.stringify(todos[i]));
 	}
-	// drop(e){
-	// 	console.log('dropped');
-	// },
 
 	componentDidMount(){
 		updateHeights(this.refs.list);
 		window.addEventListener('resize', e=>this.forceUpdate());
+		document.addEventListener('dragend', e=>console.log('dragend doc'));
+		document.addEventListener('drop', e=>console.log('drop doc'));
 	}
 	componentDidUpdate(p,s){
 		updateHeights(this.refs.list);
@@ -69,29 +72,27 @@ module.exports = class extends React.PureComponent {
 
 		return v('ol', {
 				ref:'list',
-				// onDrop:dragI>=0&&this.drop,
+				onDrop:dragI>=0&&this.drop,
 				onDragEnd:dragI>=0&&this.dragEnd,
 				onKeyUp:e=>updateHeights(e.currentTarget)
 			},
-			todos.map((todo,i)=>{
-				const time = Date.now()-todo.date.getTime();
-				return v('li', {key:todo.id, draggable:true,
+			todos.map((todo,i)=>
+				v('li', {key:todo.id, draggable:true,
 						onDragStart:e=>this.dragStart(e,i), 
 						onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
 						style: {opacity:dragI===i?.5:1}
 					},
-					v('input', {
-						type:'checkbox', 
-						onChange:e=>this.updateTodo(i, {checked:e.target.checked}),
-						checked:Boolean(todo.checked)
+					v(TodoTime, {
+						checked: Boolean(todo.checked),
+						time: (Date.now()-todo.date.getTime())/60000,
+						onChange:e=>this.updateTodo(i, {checked:e.target.checked})
 					}),
 					v(TodoItem, {
 						text: todo.text,
 						update: text=>this.updateTodo(i,{text})
-					}),
-					v('time', {style: {backgroundImage:	!todo.checked&&`radial-gradient(ellipse closest-side, rgba(255,0,0,${1/(1+345600e3/time)}) 50%, transparent)`}}, timeago(time))
-				);
-			})
+					})
+				)
+			)
 		);
 	}
 };
