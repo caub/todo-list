@@ -20,7 +20,7 @@ module.exports = class extends React.PureComponent {
 			this.props.update(e.currentTarget.innerHTML);
 		};
 		this.focus = e=>{
-			if (this.state.text!==undefined || e.target.tagName=='A') return;
+			if (this.state.text!==undefined || e.target.matches('a, a *')) return;
 			const propsText = this.props.text;
 			this.setState({text: propsText});
 			// console.log('focus');
@@ -30,7 +30,23 @@ module.exports = class extends React.PureComponent {
 			setRange(r);
 			// }
 		};
-		// click on links todo
+		this.shortCuts = e=>{
+			if (e.ctrlKey && (e.keyCode==66||e.keyCode==73)) { // ctrl+b or ctrl+i
+				const r = getRange();
+				if (r.isCollapsed) return;
+				const s = r+'', pattern = '*'.repeat(e.keyCode==66?2:1);
+				const s2 = s.startsWith(pattern) && s.endsWith(pattern) ? s.slice(pattern.length,-pattern.length) : pattern+s+pattern;
+				document.execCommand('insertText', null, s2);
+				const r2 = getRange();
+				r2.setStart(r2.startContainer, r2.startOffset-s2.length);
+				setRange(r2);
+				// todo extends to |**..**| or **|..|** 
+				// todo don't do nested things
+				// **..|.|.** -> ..**|.|**.
+				// |.**..**..| -> **|.....|**
+			}
+		};
+		
 	}
 
 	render() { 
@@ -40,6 +56,7 @@ module.exports = class extends React.PureComponent {
 			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
 			onMouseDown:this.focus,
 			onBlur: this.blur
+			// onKeyDown: this.shortCuts
 		});
 	}
 
