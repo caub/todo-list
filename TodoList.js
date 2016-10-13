@@ -1,6 +1,6 @@
 const [React, TodoItem, {updateHeights, timeago}]  = require('react', './TodoItem', './utils');
 const v = React.createElement;
-const {abs} = Math;
+const {abs, log10, exp} = Math;
 
 function restorePointerEvents(e){
 	e.currentTarget.removeEventListener('transitionend', restorePointerEvents);
@@ -73,8 +73,9 @@ module.exports = class extends React.PureComponent {
 				onDragEnd:dragI>=0&&this.dragEnd,
 				onKeyUp:e=>updateHeights(e.currentTarget)
 			},
-			todos.map((todo,i)=>
-				v('li', {key:todo.id, draggable:true,
+			todos.map((todo,i)=>{
+				const time = Date.now()-todo.date.getTime();
+				return v('li', {key:todo.id, draggable:true,
 						onDragStart:e=>this.dragStart(e,i), 
 						onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
 						style: {opacity:dragI===i?.5:1}
@@ -88,9 +89,9 @@ module.exports = class extends React.PureComponent {
 						text: todo.text,
 						update: text=>this.updateTodo(i,{text})
 					}),
-					v('time', null, timeago(todo.time))
-				)
-			)
+					v('time', {style: {backgroundImage:	!todo.checked&&`radial-gradient(ellipse closest-side, rgba(255,0,0,${1/(1+345600e3/time)}) 50%, transparent)`}}, timeago(time))
+				);
+			})
 		);
 	}
 };

@@ -11,12 +11,11 @@ function updateHeights(list){ // update heights for each <li> item, that are abs
 	list.style.height = y+'px';
 }
 
-function timeago(date) {
-	const now=Date.now(), t=date.getTime();
-	if (now-t<60e3) return 'just now';
-	if (now-t<3600e3) return `${floor((now-t)/60e3)}mn ago`;
-	if (now-t<86400e3) return `${floor((now-t)/3600e3)}h ago`;
-	const y = floor((now-t)/31536000e3), d = floor((now-t-y*31536000e3)/86400e3);
+function timeago(time) {
+	if (time<60e3) return 'just now';
+	if (time<3600e3) return `${floor(time/60e3)}mn ago`;
+	if (time<86400e3) return `${floor(time/3600e3)}h ago`;
+	const y = floor(time/31536000e3), d = floor((time-y*31536000e3)/86400e3);
 	return (y?`${y}y`:'')+(y&&d?' ':'')+(d?`${d}d`:'')+' ago';
 }
 

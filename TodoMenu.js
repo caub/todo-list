@@ -9,15 +9,15 @@ module.exports = class extends React.PureComponent {
 		super(props);
 		const {update} = props;
 		this.add = () =>
-			update(todos=>[{id:maxId(todos)+1, text:'New todo #'+(todos.length+1), time: new Date()}].concat(todos));
+			update(todos=>[{id:maxId(todos)+1, text:'New todo #'+(todos.length+1), date: new Date()}].concat(todos));
 		this.trash = () =>
 			update(todos=>todos.filter(t=>!t.checked))
 
 		this.sortByText = () =>
-			update(todos=>todos.slice().sort((a,b)=>(a.text>b.text)-.5))
+			update(todos=>todos.slice().sort((a,b)=>a.checked===b.checked?(a.text>b.text)-.5:a.checked?1:-1))
 
 		this.sortByTime = () =>
-			update(todos=>todos.slice().sort((a,b)=>(a.time<b.time)-.5))
+			update(todos=>todos.slice().sort((a,b)=>a.checked===b.checked?(a.date<b.date)-.5:a.checked?1:-1))
 
 	}
 	
