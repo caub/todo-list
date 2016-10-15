@@ -18,6 +18,7 @@ header {text-align: center;}
 .buttons {
 	display: flex;
 	justify-content: center;
+	margin-bottom: 1rem;
 }
 
 button[disabled] {
@@ -35,6 +36,20 @@ ol {
 	position: relative;
 	height:0;
 	transition: all .3s ease-in-out;
+	outline-color: transparent;
+}
+
+ol:empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	outline: auto rgba(0,0,0,.2);
+}
+ol:empty::before{
+	content: 'No todos!';
+	font-size: 2em;
+	opacity: .7;
 }
 
 li {

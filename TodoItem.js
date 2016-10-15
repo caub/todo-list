@@ -63,7 +63,7 @@ module.exports = class extends React.PureComponent {
 
 
 
-const markdownToHtml = text => text.replace(/(!)?\[([^\]]+)\]\(([^)]+)\)/g, (_,i,t,u)=>i?`<img src="${u}" title="${t}" onload="event.target.dispatchEvent(new KeyboardEvent('keyup', event))">`:`<a href="${t}">${t}</a>`);
+const markdownToHtml = text => text.replace(/(!)?\[([^\]]+)\]\(([^)]+)\)/g, (_,i,t,u)=>i?`<img src="${u}" title="${t}" onload="event.target.dispatchEvent(new KeyboardEvent('keyup', event))">`:`<a href="${u}">${t}</a>`);
 
 
 // v('div', {
