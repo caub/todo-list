@@ -51,7 +51,7 @@ module.exports = class extends React.PureComponent {
 	render() { 
 		const stateText = this.state.text, propsText = this.props.text;
 		return v('div', {ref:'div',
-			contentEditable: stateText!==undefined?'plaintext-only':false,
+			contentEditable: stateText!==undefined,
 			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
 			onMouseDown:this.focus,
 			onBlur: this.blur
@@ -61,11 +61,7 @@ module.exports = class extends React.PureComponent {
 
 };
 
-const markdownToHtml = text => text
-	.replace(/`([^`]+)`/g, '<code>$1</code>')
-	.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-	.replace(/\*([^*]+)\*/g, '<em>$1</em>')
-	.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+const markdownToHtml = text => text.replace(/(!)?\[([^\]]+)\]\(([^)]+)\)/g, (_,i,t,u)=>i?`<img src="${u}" title="${t}">`:`<a href="${t}">${t}</a>`);
 
 
 // v('div', {

@@ -14,7 +14,7 @@ module.exports = class extends React.PureComponent {
 		const rgb = k<0 ? rgb1.map((x,i)=>round(-x*k+rgb2[i]*(1+k))) : rgb3.map((x,i)=>round(x*k+rgb2[i]*(1-k)));
 		return v('input', {
 			type:'checkbox',
-			'data-time': timeago(time),
+			title: timeago(time),
 			style: {backgroundImage:`radial-gradient(ellipse closest-side, rgba(${rgb},.8) 50%, transparent)`},
 			onChange,
 			checked

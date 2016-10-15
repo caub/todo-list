@@ -6,6 +6,7 @@ function restorePointerEvents(e){
 	e.currentTarget.removeEventListener('transitionend', restorePointerEvents);
 	e.currentTarget.style.pointerEvents = '';
 }
+const preventDefault = e=>e.preventDefault();
 
 module.exports = class extends React.PureComponent {
 
@@ -70,15 +71,15 @@ module.exports = class extends React.PureComponent {
 
 		return v('ol', {
 				ref:'list',
-				onDragOver: e=>e.preventDefault(),
-				onDrop:dragI>=0&&this.drop,
-				onDragEnd:dragI>=0&&this.dragEnd,
-				onKeyUp:e=>updateHeights(e.currentTarget)
+				onDragOver: preventDefault,
+				onDrop: this.drop,
+				onDragEnd: this.dragEnd,
+				onKeyUp: e=>updateHeights(e.currentTarget)
 			},
 			todos.map((todo,i)=>
 				v('li', {key:todo.id, draggable:true,
-						onDragStart:e=>this.dragStart(e,i), 
-						onDragOver:dragI>=0&&(e=>this.dragOver(e,i)),
+						onDragStart: e=>this.dragStart(e,i), 
+						onDragOver: e=>this.dragOver(e,i),
 						style: {opacity:dragI===i?.5:1}
 					},
 					v(TodoTime, {

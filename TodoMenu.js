@@ -20,6 +20,7 @@ module.exports = class extends React.PureComponent {
 			update(todos=>todos.slice().sort((a,b)=>a.checked===b.checked?(a.date<b.date)-.5:a.checked?1:-1))
 
 		this.drop = e=>{
+			e.preventDefault();
 			const text = e.dataTransfer.getData('text');
 			try {
 				const data = JSON.parse(text);
