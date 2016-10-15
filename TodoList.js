@@ -26,6 +26,10 @@ module.exports = class extends React.PureComponent {
 		this.dragEnd=(e)=>{
 			this.setState({todos:undefined, dragI:-1});
 		};
+
+		this.updateHeights = () => updateHeights(this.refs.list);
+
+		this.updateHeights2 = () => console.log(222)||updateHeights(this.refs.list);
 	}
 
 
@@ -57,12 +61,14 @@ module.exports = class extends React.PureComponent {
 	}
 
 	componentDidMount(){
-		updateHeights(this.refs.list);
-		window.addEventListener('resize', e=>this.forceUpdate());
+		this.updateHeights();
+		window.addEventListener('resize', this.updateHeights);
+		this.refs.list.addEventListener('keyup', this.updateHeights, true);
 	}
 	componentDidUpdate(p,s){
-		updateHeights(this.refs.list);
+		this.updateHeights();
 	}
+	
 
 	render() { // todos is in priority searched in local state, when it's undefined, we take it in props
 		const {todos=this.props.todos, dragI} = this.state;
@@ -73,8 +79,7 @@ module.exports = class extends React.PureComponent {
 				ref:'list',
 				onDragOver: preventDefault,
 				onDrop: this.drop,
-				onDragEnd: this.dragEnd,
-				onKeyUp: e=>updateHeights(e.currentTarget)
+				onDragEnd: this.dragEnd
 			},
 			todos.map((todo,i)=>
 				v('li', {key:todo.id, draggable:true,
