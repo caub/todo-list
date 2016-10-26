@@ -28,8 +28,6 @@ module.exports = class extends React.PureComponent {
 		};
 
 		this.updateHeights = () => updateHeights(this.refs.list);
-
-		this.updateHeights2 = () => console.log(222)||updateHeights(this.refs.list);
 	}
 
 
@@ -89,7 +87,7 @@ module.exports = class extends React.PureComponent {
 					},
 					v(TodoTime, {
 						checked: Boolean(todo.checked),
-						time: (Date.now()-todo.date.getTime())/60000,
+						date: todo.date,
 						onChange:e=>this.updateTodo(i, {checked:e.target.checked})
 					}),
 					v(TodoItem, {

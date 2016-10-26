@@ -9,7 +9,8 @@ const rgb1 = [120,175,255],
 module.exports = class extends React.PureComponent {
 
 	render() { 
-		const {time, checked, onChange} = this.props,
+		const {date, checked, onChange} = this.props,
+			time = (Date.now()-date.getTime())/60000,
 			k = 2/(1+1440/time)-1;
 		const rgb = k<0 ? rgb1.map((x,i)=>round(-x*k+rgb2[i]*(1+k))) : rgb3.map((x,i)=>round(x*k+rgb2[i]*(1-k)));
 		return v('input', {

@@ -18,10 +18,11 @@ module.exports = class extends React.PureComponent {
 			// take longest between the old one and the new:
 			const [a, b] = todos2.length<history[historyI].length ? [history[historyI],todos2]:[todos2,history[historyI]]; // could .sort too
 
-			if (a.some((ai,i)=>ai!==b[i])) // put a new history entry
+			if (a.some((ai,i)=>ai!==b[i])){ // put a new history entry
 				this.setState({historyI:0, history:[todos2].concat(history.slice(historyI)), dragI:-1}, cb);
-			else 
+			} else {
 				this.setState({history:Object.assign(history.slice(), {[historyI]:todos2}), dragI:-1}, cb);
+			}
 		};
 
 		this.undo = ()=>{
