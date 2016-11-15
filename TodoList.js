@@ -2,9 +2,8 @@ const [React, TodoItem, TodoTime, {updateHeights}]  = require('react', './TodoIt
 const v = React.createElement;
 const {round} = Math;
 
-function restorePointerEvents(e){
-	e.currentTarget.removeEventListener('transitionend', restorePointerEvents);
-	e.currentTarget.style.pointerEvents = '';
+function restorePointerEvents(li){
+	li.style.pointerEvents = '';
 }
 const preventDefault = e=>e.preventDefault();
 
@@ -49,8 +48,9 @@ module.exports = class extends React.PureComponent {
 		const i2 = i - (dragI<i) + (e.clientY > pivot); // if dragI was before, we need to remove 1, if we drag after the center we add 1
 		const todos3 = todos2.slice(0,i2).concat(todos[dragI]).concat(todos2.slice(i2));
 		this.setState({todos:todos3, dragI:i2});
-		e.currentTarget.addEventListener('transitionend', restorePointerEvents);
+		
 		e.currentTarget.style.pointerEvents='none';
+		setTimeout(restorePointerEvents, 250, e.currentTarget); // transitionend not reliable
 	}
 	dragStart(e, i){
 		const {todos} = this.props;
