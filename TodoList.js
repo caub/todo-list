@@ -5,9 +5,8 @@ const {round} = Math;
 function restorePointerEvents(li){
 	li.style.pointerEvents = '';
 }
-const preventDefault = e=>e.preventDefault();
 
-module.exports = class extends React.PureComponent {
+module.exports = class TodoList extends React.PureComponent {
 
 	constructor(props){
 		super(props);
@@ -18,11 +17,12 @@ module.exports = class extends React.PureComponent {
 			const todo2 = Object.assign({}, todos[i], todo);
 			this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
 		};
-		this.drop=(e)=>{
+		this.drop = e =>{
+			if (this.state.dragI < 0) return;
 			e.preventDefault();
 			this.props.update(this.state.todos);
 		};
-		this.dragEnd=(e)=>{
+		this.dragEnd = e =>{
 			this.setState({todos:undefined, dragI:-1});
 		};
 
@@ -31,9 +31,10 @@ module.exports = class extends React.PureComponent {
 
 
 	dragOver(e, i){
-		e.preventDefault();
 		const {dragI, todos, transitioning} = this.state;
-		if (dragI===i) return;
+		if (dragI<0 || dragI===i) return;
+		e.preventDefault();
+
 		const {top, bottom} = e.currentTarget.getBoundingClientRect(),
 			// pivot = (bottom+top)/2; // easy way
 			dragHeight = this.refs.list.children[dragI].offsetHeight,
@@ -56,6 +57,8 @@ module.exports = class extends React.PureComponent {
 		const {todos} = this.props;
 		this.setState({dragI:i, todos});
 		e.dataTransfer.setData('text', JSON.stringify(todos[i]));
+		const {left, top} = e.currentTarget.parentNode.getBoundingClientRect();
+		e.dataTransfer.setDragImage(e.currentTarget.parentNode, e.clientX - left, e.clientY - top);
 	}
 
 	componentDidMount(){
@@ -75,23 +78,26 @@ module.exports = class extends React.PureComponent {
 
 		return v('ol', {
 				ref:'list',
-				onDragOver: preventDefault,
+				onDragOver: e=> dragI>=0 && e.preventDefault(),
 				onDrop: this.drop,
 				onDragEnd: this.dragEnd
 			},
 			todos.map((todo,i)=>
-				v('li', {key:todo.id, draggable:true,
-						onDragStart: e=>this.dragStart(e,i), 
+				v('li', {key:todo.id,
 						onDragOver: e=>this.dragOver(e,i),
+						onDrop: this.drop,
 						style: {opacity:dragI===i?.5:1}
 					},
 					v(TodoTime, {
+						onDragStart: e=>this.dragStart(e,i),
+						onDrop: this.drop, 
 						checked: Boolean(todo.checked),
 						date: todo.date,
 						onChange:e=>this.updateTodo(i, {checked:e.target.checked})
 					}),
 					v(TodoItem, {
 						text: todo.text,
+						onDrop: this.drop,
 						update: text=>this.updateTodo(i,{text})
 					})
 				)

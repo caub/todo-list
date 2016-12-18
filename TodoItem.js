@@ -8,18 +8,18 @@ function setRange(r) {
 }
 const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
 
-module.exports = class extends React.PureComponent {
+module.exports = class TodoItem extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {text: undefined};
 
-		this.blur = (e, text) => {
+		this.blur = e => {
 			// const stateText = this.state.text
 			this.setState({text: undefined});
-			// if (text!==e.currentTarget.innerHTML)
-			this.props.update(e.currentTarget.innerHTML);
+			if (this.props.text!==e.currentTarget.innerHTML)
+				this.props.update(e.currentTarget.innerHTML);
 		};
-		this.focus = e=>{
+		this.focus = e => {
 			if (this.state.text!==undefined || e.target.matches('a, a *')) return;
 			const propsText = this.props.text, evt = new KeyboardEvent('keyup', e);
 			this.setState({text: propsText}, ()=>this.refs.div.dispatchEvent(evt));
@@ -52,6 +52,7 @@ module.exports = class extends React.PureComponent {
 		const stateText = this.state.text, propsText = this.props.text;
 		return v('div', {ref:'div',
 			contentEditable: stateText!==undefined,
+			onDrop: this.props.drop,
 			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
 			onMouseDown:this.focus,
 			onBlur: this.blur

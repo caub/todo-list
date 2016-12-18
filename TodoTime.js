@@ -6,7 +6,7 @@ const rgb1 = [120,175,255],
 			rgb3 = [255,40,0];
 
 
-module.exports = class extends React.PureComponent {
+module.exports = class TodoTime extends React.PureComponent {
 
 	render() { 
 		const {date, checked, onChange} = this.props,
@@ -14,6 +14,9 @@ module.exports = class extends React.PureComponent {
 			k = 2/(1+1440/time)-1;
 		const rgb = k<0 ? rgb1.map((x,i)=>round(-x*k+rgb2[i]*(1+k))) : rgb3.map((x,i)=>round(x*k+rgb2[i]*(1-k)));
 		return v('input', {
+			draggable:true,
+			onDragStart: this.props.onDragStart,
+			onDrop: this.props.drop,
 			type:'checkbox',
 			title: timeago(time),
 			style: {backgroundImage:`radial-gradient(ellipse closest-side, rgba(${rgb},.8) 50%, transparent)`},

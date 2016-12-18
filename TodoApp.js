@@ -1,7 +1,8 @@
 const [React, TodoMenu, TodoList] = require('react', './TodoMenu', './TodoList');
 const v = React.createElement;
 
-module.exports = class extends React.PureComponent {
+
+module.exports = class TodoApp extends React.PureComponent {
 
 	constructor(props){
 		super(props);
@@ -38,9 +39,11 @@ module.exports = class extends React.PureComponent {
 
 	}
 
-	componentDidUpdate(p,s){
+	componentDidUpdate(){
 		localStorage.todos = JSON.stringify(this.state.history[this.state.historyI]);
+		// this.refs.flash.animate([{opacity:.1}, {opacity:.7, offset:.2},{opacity:0}], {duration: 1500});
 	}
+
 
 	componentDidMount(){
 		window.addEventListener('keydown', e=>{
@@ -50,6 +53,8 @@ module.exports = class extends React.PureComponent {
 			else if (e.ctrlKey && e.keyCode===90)
 				this.undo();
 		});
+
+
 	}
 	
 
@@ -60,10 +65,21 @@ module.exports = class extends React.PureComponent {
 		
 		return v('div', null,
 
-			v(TodoMenu, {historyI, historyLength:history.length, update:this.update}),
+			v(TodoMenu, {ref:'menu', update:this.update}),
+
+			// v('flash', {ref:'flash'}, getFlash()),
 
 			v(TodoList, {todos:history[historyI], update:this.update})
 
 		)
 	}
 };
+
+
+// function getFlash() {
+// 	var r = Math.random();
+// 	if (r<.33) return '🆗';
+// 	if (r<.66) return '🆒';
+// 	if (r<.99) return '🆙';
+// 	return '☘️';
+// }

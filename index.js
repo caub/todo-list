@@ -2,6 +2,11 @@ const [React, TodoApp] = require('react', './TodoApp');
 
 
 // initial Todos list for testing
+if (!localStorage.todosv) {
+	localStorage.todosv = '2';
+	delete localStorage.todos;
+}
+
 const todos = localStorage.todos ? 
 	JSON.parse(localStorage.todos).map(t=>Object.assign(t,{date:new Date(t.date)})) : 
 	[{
@@ -11,7 +16,7 @@ const todos = localStorage.todos ?
 		id:5, text: "Fix hole ![in the ceiling](https://s-media-cache-ak0.pinimg.com/564x/21/e3/00/21e300494123462dd0b2b0c4ece3b561.jpg)",
 		date: new Date(Date.now()-6*86400e3)
 	}, {
-		id:4, text: "💻 delete localStorage.todos if it's buggy", 
+		id:3, text: "💻 stored locally in localStorage.todos", 
 		date: new Date('2016-10-13 12:00')
 	}, {
 		id:2, text: 'Eat a 🍊', checked: true,

@@ -3,7 +3,7 @@ const v = React.createElement;
 
 const maxId = todos => Math.max(1, ...todos.map(t=>t.id));
 
-module.exports = class extends React.PureComponent {
+module.exports = class TodoMenu extends React.PureComponent {
 
 	constructor(props){
 		super(props);
@@ -16,11 +16,31 @@ module.exports = class extends React.PureComponent {
 		this.trash = () =>
 			update(todos=>todos.filter(t=>!t.checked))
 
-		this.sortByText = () =>
-			update(todos=>todos.slice().sort((a,b)=>!a.checked==!b.checked? a.text.localeCompare(b.text) : a.checked?1:-1 ))
+		this.sortByText = () => {
+			update(todos=> {
+				var sort = todos.slice().sort((a,b)=>!a.checked==!b.checked? a.text.localeCompare(b.text) : a.checked?1:-1 );
+				var isSorted = sort.length==todos.length && todos.every((ti, i) => ti.id == sort[i].id);
+				if (isSorted) {
+					this.setState({alpha:'desc'});
+					return sort.reverse()
+				}
+				this.setState({alpha:'asc'});
+				return sort;
+			})
+		}
 
-		this.sortByTime = () =>
-			update(todos=>todos.slice().sort((a,b)=>!a.checked==!b.checked? a.date-b.date : a.checked?1:-1 ))
+		this.sortByTime = () => {
+			update(todos=> {
+				var sort = todos.slice().sort((a,b)=>!a.checked==!b.checked? a.date-b.date : a.checked?1:-1 );
+				var isSorted = sort.length==todos.length && todos.every((ti, i) => ti.id == sort[i].id);
+				if (isSorted) {
+					this.setState({time:'desc'});
+					return sort.reverse()
+				}
+				this.setState({time:'asc'});
+				return sort;
+			})
+		}
 
 		this.drop = e=>{
 			e.preventDefault();
@@ -33,16 +53,21 @@ module.exports = class extends React.PureComponent {
 			}
 		}
 
+		this.state = {alpha:'asc', time:'asc'};
+
 	}
+
 	
 
 	render() {
-
+		var {alpha, time} = this.state;
 		return v('div', {className:'buttons'},
 			v('button', {title: 'Add a todo', onClick: this.add}, v('i', {className:'fa fa-plus'})),
-			v('button', {title: 'Sort by text', onClick:this.sortByText}, v('i', {className:'fa fa-sort-alpha-asc'})),
-			v('button', {title: 'Sort by date', onClick:this.sortByTime}, v('i', {className:'fa fa-sort-amount-asc'})),
-			v('button', {title: 'Drop completed', onClick:this.trash, onDrop:this.drop, onDragOver: e=>e.preventDefault()}, v('i', {className:'fa fa-trash-o'}))
+			v('button', {title: 'Sort by text', onClick:this.sortByText}, v('i', {className:'fa fa-sort-alpha-'+alpha})),
+			v('button', {title: 'Sort by date', onClick:this.sortByTime}, v('i', {className:'fa fa-sort-amount-'+time})),
+			v('button', {title: 'Drop completed', onClick:this.trash, onDrop:this.drop, onDragOver: e=>e.preventDefault()}, v('i', {className:'fa fa-trash-o'})),
+			v('flash', {ref:'flash'})
 		);
 	}
 };
+

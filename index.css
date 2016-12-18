@@ -14,11 +14,13 @@ header {text-align: center;}
 	/*body {--grad: 90%;}*/
 }
 
+flash {
+	opacity: 0;
+}
 
 .buttons {
-	display: flex;
-	justify-content: center;
-	margin-bottom: 1rem;
+	display: inline-block;
+	margin-bottom: 8px;
 }
 
 button[disabled] {
@@ -36,7 +38,7 @@ ol {
 	position: relative;
 	height:0;
 	transition: all .3s ease-in-out;
-	outline-color: transparent;
+	/*outline: auto blue;*/
 }
 
 ol:empty {
