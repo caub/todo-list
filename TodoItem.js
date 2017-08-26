@@ -50,37 +50,15 @@ module.exports = class TodoItem extends React.PureComponent {
 
 	render() { 
 		const stateText = this.state.text, propsText = this.props.text;
-		return v('div', {ref:'div',
-			contentEditable: stateText!==undefined,
-			onDrop: this.props.drop,
+		return v('div', Object.assign({ref:'div',
+			onDrop: this.props.onDrop,
 			dangerouslySetInnerHTML:{__html: stateText||markdownToHtml(propsText)}, // final text (props) or text editing mode (state)
 			onMouseDown:this.focus,
 			onBlur: this.blur
 			// onKeyDown: this.shortcuts
-		});
+		}, !this.props.checked && stateText!==undefined && {contentEditable: ''}));
 	}
 
 };
 
-
-
 const markdownToHtml = text => text.replace(/(!)?\[([^\]]+)\]\(([^)]+)\)/g, (_,i,t,u)=>i?`<img src="${u}" title="${t}" onload="event.target.dispatchEvent(new KeyboardEvent('keyup', event))">`:`<a href="${u}">${t}</a>`);
-
-
-// v('div', {
-// 	dangerouslySetInnerHTML:{__html:todo.text},
-// 	onMouseDown:e=>{
-// 		e.currentTarget.contentEditable=true;
-		
-// 		if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
-// 			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
-// 			setRange(r);
-// 		}
-// 		// e.currentTarget.
-// 	},
-// 	onBlur:e=>{
-// 		e.currentTarget.contentEditable=false;
-// 		if (e.currentTarget.innerHTML!==todo.text)
-// 			this.updateTodo(i, {text:e.currentTarget.innerHTML})
-// 	}
-// }),

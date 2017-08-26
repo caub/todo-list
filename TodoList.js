@@ -97,6 +97,7 @@ module.exports = class TodoList extends React.PureComponent {
 					}),
 					v(TodoItem, {
 						text: todo.text,
+						checked: Boolean(todo.checked),
 						onDrop: this.drop,
 						update: text=>this.updateTodo(i,{text})
 					})

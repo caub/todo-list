@@ -7,17 +7,17 @@ module.exports = class TodoMenu extends React.PureComponent {
 
 	constructor(props){
 		super(props);
-		const {update} = props;
+
 		this.add = () =>
-			update(todos=>{
+			this.props.update(todos=>{
 				const id = maxId(todos)+1;
 				return [{id, text:'New todo #'+id, date: new Date()}].concat(todos);
 			});
 		this.trash = () =>
-			update(todos=>todos.filter(t=>!t.checked))
+			this.props.update(todos=>todos.filter(t=>!t.checked))
 
 		this.sortByText = () => {
-			update(todos=> {
+			this.props.update(todos=> {
 				var sort = todos.slice().sort((a,b)=>!a.checked==!b.checked? a.text.localeCompare(b.text) : a.checked?1:-1 );
 				var isSorted = sort.length==todos.length && todos.every((ti, i) => ti.id == sort[i].id);
 				if (isSorted) {
@@ -30,7 +30,7 @@ module.exports = class TodoMenu extends React.PureComponent {
 		}
 
 		this.sortByTime = () => {
-			update(todos=> {
+			this.props.update(todos=> {
 				var sort = todos.slice().sort((a,b)=>!a.checked==!b.checked? a.date-b.date : a.checked?1:-1 );
 				var isSorted = sort.length==todos.length && todos.every((ti, i) => ti.id == sort[i].id);
 				if (isSorted) {
@@ -47,7 +47,7 @@ module.exports = class TodoMenu extends React.PureComponent {
 			const text = e.dataTransfer.getData('text');
 			try {
 				const data = JSON.parse(text);
-				update(todos=>todos.filter(t=>t.id!==data.id));
+				this.props.update(todos=>todos.filter(t=>t.id!==data.id));
 			} catch(e){
 				console.error(e)
 			}
