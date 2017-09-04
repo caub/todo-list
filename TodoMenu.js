@@ -66,7 +66,7 @@ module.exports = class TodoMenu extends React.PureComponent {
 			v('button', {title: 'Sort by text', onClick:this.sortByText}, v('i', {className:'fa fa-sort-alpha-'+alpha})),
 			v('button', {title: 'Sort by date', onClick:this.sortByTime}, v('i', {className:'fa fa-sort-amount-'+time})),
 			v('button', {title: 'Drop completed', onClick:this.trash, onDrop:this.drop, onDragOver: e=>e.preventDefault()}, v('i', {className:'fa fa-trash-o'})),
-			v('flash', {ref:'flash'})
+			v('flash', {ref:'flash'}, 'ctrl+(shift+)z to undo/redo')
 		);
 	}
 };

@@ -15,12 +15,16 @@ header {text-align: center;}
 }
 
 flash {
-	opacity: 0;
+	opacity: .5;
+	padding: 0 1em;
+	font-size: 12px;
+	font-family: monospace;
 }
 
 .buttons {
-	display: inline-block;
+	display: flex;
 	margin-bottom: 8px;
+	align-items: center;
 }
 
 button[disabled] {
