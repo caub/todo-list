@@ -1,4 +1,8 @@
-const [React, TodoItem, TodoTime, {updateHeights}]  = require('react', './TodoItem', './TodoTime', './utils');
+import React from 'react';
+import TodoItem from './TodoItem';
+import TodoTime from './TodoTime';
+import {updateHeights} from '../utils';
+
 const v = React.createElement;
 const {round} = Math;
 
@@ -6,7 +10,7 @@ function restorePointerEvents(li){
 	li.style.pointerEvents = '';
 }
 
-module.exports = class TodoList extends React.PureComponent {
+export default class TodoList extends React.PureComponent {
 
 	constructor(props){
 		super(props);

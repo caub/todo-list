@@ -1,5 +1,6 @@
-const [React, TodoApp] = require('react', './TodoApp');
-
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TodoApp from './TodoApp';
 
 // initial Todos list for testing
 if (!localStorage.todosv) {
@@ -23,8 +24,7 @@ const todos = localStorage.todos ?
 		date: new Date(Date.now()-96*3.6e6)
 	}];
 
-ReactDOM.render(React.createElement(TodoApp, {todos}), todoapp)
 
+const app = ReactDOM.render(React.createElement(TodoApp, {todos}), todoapp);
 
-
-
+export default app;

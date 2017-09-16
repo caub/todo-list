@@ -1,4 +1,5 @@
-const React = require('react');
+import React from 'react';
+
 const v = React.createElement;
 const sel = getSelection();
 
@@ -8,7 +9,7 @@ function setRange(r) {
 }
 const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
 
-module.exports = class TodoItem extends React.PureComponent {
+export default class TodoItem extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {text: undefined};

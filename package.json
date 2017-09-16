@@ -1,0 +1,26 @@
+{
+  "name": "todo-list",
+  "version": "1.0.0",
+  "description": "Todo List",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "fserve": "file:../fserve"
+  },
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caub/todo-list.git"
+  },
+  "author": "caub",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caub/todo-list/issues"
+  },
+  "homepage": "https://github.com/caub/todo-list#readme"
+}

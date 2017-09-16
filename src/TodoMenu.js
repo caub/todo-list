@@ -1,9 +1,10 @@
-const React = require('react');
+import React from 'react';
+
 const v = React.createElement;
 
 const maxId = todos => Math.max(1, ...todos.map(t=>t.id));
 
-module.exports = class TodoMenu extends React.PureComponent {
+export default class TodoMenu extends React.PureComponent {
 
 	constructor(props){
 		super(props);

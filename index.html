@@ -4,7 +4,7 @@
 	<meta charset="utf-8" name="viewport" content="width=device-width">
 	<title></title>
 	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 </head>
@@ -21,77 +21,37 @@
 
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.0/react.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.0/react-dom.min.js"></script>
+<script src="https://unpkg.com/react@15.6.1/dist/react.min.js" data-lib="react"></script>
+<script src="https://unpkg.com/react-dom@15.6.1/dist/react-dom.min.js" data-lib="react-dom"></script>
+<script src="https://unpkg.com/react-redux@5.0.6/dist/react-redux.min.js" data-lib="react-redux"></script>
 
 <script>
-window.require = (()=>{
 
-	const ROOT = location.origin + location.pathname.replace(/[^/]*\.[^/]+$/, ''); // cache against history.pushState mutation
-	const REQUIRE_CACHE = Object.create(null);
-	const RE_EXT = /\.js\w*$/;
-	let AsyncFunction = (function*(){}).constructor;
-	let exec = (MODULE, it) => Promise.resolve().then(function pump(v) {
-			const {done, value} = it.next(v);
-			if(done) return value;
-			return Promise.resolve(value).then(pump, it.throw.bind(it));
-		}).then(() => MODULE.exports);
-	let replacer = code => code.replace(/\brequire\(/g, ' yield require(');
-	try {
-		AsyncFunction = eval('async()=>{}').constructor;
-		exec = (MODULE, it) => it.then(() => MODULE.exports);
-		replacer = code => code.replace(/\brequire\(/g, ' await require(');
-	} catch(e) {}
+const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => s.dataset.lib);
+const swUrl = 'sw-proxy.js?l='+JSON.stringify(libs);
+navigator.serviceWorker.register(swUrl).then(sw => {
+	console.log("Registered", sw);
+}).catch(err => {
+	console.log("Error", err);
+})
+.then(() => {
+	load('./src/index.js');
+});
+// navigator.serviceWorker.getRegistration(swUrl).then(registration => {
+// 	console.log(registration);
+// 	if (!registration) {
+		
+// 	}
+// });
 
-	const transform = window.Babel ? code=>Babel.transform(code, { presets: ['react'] }).code : code=>code;
-
-	function fqn(url, dirname) {
-		const {href} = new URL( (url.startsWith('/')?ROOT:dirname ) + url ),
-			last = href.lastIndexOf('/'), dir = href.slice(0, last+1), name = href.slice(last+1),
-			filename = name ? (RE_EXT.test(name)?name:name+'.js') : 'index.js';
-		return {dir, abs: dir+filename};
-	}
-
-	function require(...urls) {
-
-		const requone = url => { // require one
-			if (REQUIRE_CACHE[url]) {
-				return Promise.resolve(REQUIRE_CACHE[url].exports);
-			}
-			const {dir, abs} = fqn(url, this.__dirname);
-
-			if (REQUIRE_CACHE[abs]) {
-				return Promise.resolve(REQUIRE_CACHE[abs].exports);
-			}
-			if (abs.endsWith('.json')) {
-				return fetch(abs).then(r=>r.json()).then(code=>
-					REQUIRE_CACHE[abs].exports = {exports: code}
-				)
-			}
-			return fetch(abs).then(r=>r.text())
-				.then(transform)
-				.then(replacer)
-				.then(code=>{
-					const executableCode = new AsyncFunction('module', 'exports', '__dirname', 'require', code + '\n\n//# sourceURL=' + abs);
-					const MODULE = REQUIRE_CACHE[abs] = {
-						__dirname: dir,
-						exports: {}
-					};
-					const it = executableCode.call(MODULE.exports, MODULE, MODULE.exports, dir, require.bind(MODULE));
-					return exec(MODULE, it);
-				});
-		}
-		return urls.length==1 ? requone(urls[0]) : Promise.all(urls.map(requone));
-	}
-	return Object.assign( require.bind({__dirname: ROOT}), {cache: REQUIRE_CACHE});
-})();
-
-
-	
-	
-	
-require.cache.react = {exports: React};
-require('./index.js')
+const load = src => new Promise((resolve, reject) => {
+	var script = document.createElement('script');
+	script.setAttribute('type', 'module');
+	script.setAttribute('src', src);
+	script.onload = resolve;
+	script.onerror = reject;
+	document.body.appendChild(script);
+})
 </script>
 
 

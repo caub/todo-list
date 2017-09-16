@@ -1,8 +1,10 @@
-const [React, TodoMenu, TodoList] = require('react', './TodoMenu', './TodoList');
+import React from 'react';
+import TodoMenu from './TodoMenu';
+import TodoList from './TodoList';
+
 const v = React.createElement;
 
-
-module.exports = class TodoApp extends React.PureComponent {
+export default class TodoApp extends React.PureComponent {
 
 	constructor(props){
 		super(props);

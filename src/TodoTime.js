@@ -1,4 +1,6 @@
-const [React, {timeago}] = require('react', './utils');
+import React from 'react';
+import {timeago} from '../utils';
+
 const v = React.createElement;
 const rgb1 = [120,175,255],
 			rgb2 = [255,255,0],
@@ -22,4 +24,4 @@ const TodoTime = ({date, checked, onChange, onDragStart, onDrop}) => {
 	});
 };
 
-module.exports = TodoTime;
+export default TodoTime;

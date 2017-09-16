@@ -2,7 +2,7 @@
 const {floor} = Math;
 
 
-function updateHeights(list){ // update heights for each <li> item, that are absolute positioned
+export function updateHeights(list){ // update heights for each <li> item, that are absolute positioned
 	let y=0;
 	for (let el of list.children){
 		el.style.transform = `translateY(${y}px)`;
@@ -11,13 +11,15 @@ function updateHeights(list){ // update heights for each <li> item, that are abs
 	list.style.height = y+'px';
 }
 
-function timeago(time) { // time in minutes
+export function timeago(time) { // time in minutes
 	if (time<1) return 'just now';
 	if (time<60) return `${floor(time)}' ago`;
 	if (time<1440) return `${floor(time/60)}h ago`;
 	const y = floor(time/525600), d = floor((time-y*525600)/1440);
 	return (y?`${y}y`:'')+(y&&d?' ':'')+(d?`${d}d`:'')+' ago';
 }
+
+export default updateHeights;
 
 // console.log(...[
 // 	new Date('2016-10-09 20:40'),
@@ -79,9 +81,3 @@ if (document.caretPositionFromPoint && !document.caretRangeFromPoint){
 	}
 }
 
-
-
-module.exports = {
-	updateHeights,
-	timeago
-};
