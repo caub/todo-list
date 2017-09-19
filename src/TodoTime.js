@@ -1,5 +1,5 @@
 import React from 'react';
-import {timeago} from '../utils';
+import {timeago} from './utils';
 
 const v = React.createElement;
 const rgb1 = [120,175,255],

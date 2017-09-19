@@ -9,40 +9,35 @@ export default class TodoApp extends React.PureComponent {
 	constructor(props){
 		super(props);
 		this.state = {
-			historyI: 0, // history index representing the current state of app // 0 is most recent .. length-1 oldest entry
-			history: [this.props.todos], //  list/store of all historical todos, need to find a better way to expose it
+			value: this.props.todos,
+			next: [],
+			prev: []
 		};
 
-		// update/'increment' history with a new todos lists
-		this.update = (todos, cb) => { // no top-level class props in JS yet, but it's coming
-			const {historyI, history} = this.state;
-			const todos2 = typeof todos==='function' ? todos(history[historyI]) : todos;
-			// not check quickly if it's really worth updating
-			// take longest between the old one and the new:
-			const [a, b] = todos2.length<history[historyI].length ? [history[historyI],todos2]:[todos2,history[historyI]]; // could .sort too
-
-			if (a.some((ai,i)=>ai!==b[i])){ // put a new history entry
-				this.setState({historyI:0, history:[todos2].concat(history.slice(historyI)), dragI:-1}, cb);
-			} else {
-				this.setState({history:Object.assign(history.slice(), {[historyI]:todos2}), dragI:-1}, cb);
-			}
+		this.update = (todos, cb) => {
+			const {value, prev} = this.state;
+			const todos2 = typeof todos==='function' ? todos(value) : todos;
+			
+			this.setState({value: todos2, prev: prev.concat([value]), next: []}, cb);
 		};
 
 		this.undo = ()=>{
-			const {historyI, history} = this.state;
-			if (historyI<history.length-1)
-				this.setState({historyI: historyI+1});
+			const {value, next, prev} = this.state;
+			if (prev.length) {
+				this.setState({prev: prev.slice(0,-1), value: prev[prev.length-1], next:[value].concat(next)});
+			}
 		};
 		this.redo = ()=>{
-			const {historyI} = this.state;
-			if (historyI>0)
-				this.setState({historyI: historyI-1});
+			const {value, next, prev} = this.state;
+			if (next.length) {
+				this.setState({prev: prev.concat([value]), value: next[0], next:next.slice(1)});
+			}
 		};
 
 	}
 
 	componentDidUpdate(){
-		localStorage.todos = JSON.stringify(this.state.history[this.state.historyI]);
+		localStorage.todos = JSON.stringify(this.state.value);
 		// this.refs.flash.animate([{opacity:.1}, {opacity:.7, offset:.2},{opacity:0}], {duration: 1500});
 	}
 
@@ -55,23 +50,18 @@ export default class TodoApp extends React.PureComponent {
 			else if (e.ctrlKey && e.keyCode===90)
 				this.undo();
 		});
-
-
 	}
 	
 
 	render(){
-		const {dragI, historyI, history} = this.state;
 
-		// console.log('render app', historyI, history.length);
-		
 		return v('div', null,
 
 			v(TodoMenu, {ref:'menu', update:this.update}),
 
 			// v('flash', {ref:'flash'}, getFlash()),
 
-			v(TodoList, {todos:history[historyI], update:this.update})
+			v(TodoList, {todos: this.state.value, update:this.update})
 
 		)
 	}

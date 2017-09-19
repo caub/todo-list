@@ -1,16 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore }  from 'redux';
 import TodoApp from './TodoApp';
 
-// initial Todos list for testing
-if (!localStorage.todosv) {
-	localStorage.todosv = '2';
-	delete localStorage.todos;
+// const store = createStore(todoApp);
+
+const parseTodos = s => {
+	try {
+		const todos = JSON.parse(s);
+		return Array.isArray(todos) ? todos : undefined;
+	} catch(e) {
+	}
 }
 
-const todos = localStorage.todos ? 
-	JSON.parse(localStorage.todos).map(t=>Object.assign(t,{date:new Date(t.date)})) : 
-	[{
+const todos = (parseTodos(localStorage.todos) || [{
 		id:1, text: 'Reply to <strong>John</strong>',
 		date: new Date(Date.now()-36*3.6e6)
 	}, {
@@ -22,7 +26,7 @@ const todos = localStorage.todos ?
 	}, {
 		id:2, text: 'Eat a 🍊', checked: true,
 		date: new Date(Date.now()-96*3.6e6)
-	}];
+	}]).map(t=>Object.assign(t, {date:new Date(t.date)}));
 
 
 const app = ReactDOM.render(React.createElement(TodoApp, {todos}), todoapp);

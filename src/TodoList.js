@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import TodoItem from './TodoItem';
 import TodoTime from './TodoTime';
-import {updateHeights} from '../utils';
+import {updateHeights} from './utils';
 
 const v = React.createElement;
 const {round} = Math;

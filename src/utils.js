@@ -1,7 +1,4 @@
 
-const {floor} = Math;
-
-
 export function updateHeights(list){ // update heights for each <li> item, that are absolute positioned
 	let y=0;
 	for (let el of list.children){
@@ -13,13 +10,11 @@ export function updateHeights(list){ // update heights for each <li> item, that 
 
 export function timeago(time) { // time in minutes
 	if (time<1) return 'just now';
-	if (time<60) return `${floor(time)}' ago`;
-	if (time<1440) return `${floor(time/60)}h ago`;
-	const y = floor(time/525600), d = floor((time-y*525600)/1440);
+	if (time<60) return `${Math.floor(time)}' ago`;
+	if (time<1440) return `${Math.floor(time/60)}h ago`;
+	const y = Math.floor(time/525600), d = Math.floor((time-y*525600)/1440);
 	return (y?`${y}y`:'')+(y&&d?' ':'')+(d?`${d}d`:'')+' ago';
 }
-
-export default updateHeights;
 
 // console.log(...[
 // 	new Date('2016-10-09 20:40'),

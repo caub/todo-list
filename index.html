@@ -23,12 +23,13 @@
 
 <script src="https://unpkg.com/react@15.6.1/dist/react.min.js" data-lib="react"></script>
 <script src="https://unpkg.com/react-dom@15.6.1/dist/react-dom.min.js" data-lib="react-dom"></script>
+<script src="https://unpkg.com/redux@3.7.2/dist/redux.min.js" data-lib="redux"></script>
 <script src="https://unpkg.com/react-redux@5.0.6/dist/react-redux.min.js" data-lib="react-redux"></script>
 
 <script>
 
 const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => s.dataset.lib);
-const swUrl = 'sw-proxy.js?l='+JSON.stringify(libs);
+const swUrl = 'sw.js?l='+JSON.stringify(libs);
 navigator.serviceWorker.register(swUrl).then(sw => {
 	console.log("Registered", sw);
 }).catch(err => {
