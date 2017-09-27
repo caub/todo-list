@@ -1,20 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { createElement as v } from 'react';
+import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore }  from 'redux';
+import todoApp from './reducers';
 import TodoApp from './TodoApp';
 
-// const store = createStore(todoApp);
 
 const parseTodos = s => {
 	try {
-		const todos = JSON.parse(s);
-		return Array.isArray(todos) ? todos : undefined;
+		const todos = JSON.parse(s, (k,v) => k==='date' ? new Date(v) : v);
+		if (Array.isArray(todos)) return todos;
 	} catch(e) {
 	}
-}
-
-const todos = (parseTodos(localStorage.todos) || [{
+	// else return a random initial default
+	return [{
 		id:1, text: 'Reply to <strong>John</strong>',
 		date: new Date(Date.now()-36*3.6e6)
 	}, {
@@ -26,9 +25,20 @@ const todos = (parseTodos(localStorage.todos) || [{
 	}, {
 		id:2, text: 'Eat a 🍊', checked: true,
 		date: new Date(Date.now()-96*3.6e6)
-	}]).map(t=>Object.assign(t, {date:new Date(t.date)}));
+	}];
+}
 
+const todos = parseTodos(localStorage.todos);
 
-const app = ReactDOM.render(React.createElement(TodoApp, {todos}), todoapp);
+const store = createStore(todoApp, {value: todos});
 
-export default app;
+store.subscribe(() => {
+	localStorage.todos = JSON.stringify(store.getState().value);
+});
+
+render(
+	v(Provider, {store},
+		v(TodoApp)
+	),
+	todoapp
+);

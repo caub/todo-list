@@ -1,15 +1,14 @@
-import React from 'react';
+import { createElement as v, PureComponent } from 'react';
 
-const v = React.createElement;
 const sel = getSelection();
 
 function setRange(r) {
 	sel.removeAllRanges();
 	sel.addRange(r);
 }
-const getRange = ()=>sel.rangeCount?sel.getRangeAt(0):new Range();
+const getRange = () => sel.rangeCount ? sel.getRangeAt(0) : new Range();
 
-export default class TodoItem extends React.PureComponent {
+export default class TodoItem extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {text: undefined};

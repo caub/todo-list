@@ -21,28 +21,26 @@
 
 </main>
 
-<script src="https://unpkg.com/react@15.6.1/dist/react.min.js" data-lib="react"></script>
-<script src="https://unpkg.com/react-dom@15.6.1/dist/react-dom.min.js" data-lib="react-dom"></script>
-<script src="https://unpkg.com/redux@3.7.2/dist/redux.min.js" data-lib="redux"></script>
-<script src="https://unpkg.com/react-redux@5.0.6/dist/react-redux.min.js" data-lib="react-redux"></script>
+<script src="https://unpkg.com/react@15.6.1/dist/react.js" data-lib="react"></script>
+<script src="https://unpkg.com/react-dom@15.6.1/dist/react-dom.js" data-lib="react-dom" data-name="ReactDOM"></script>
+<script src="https://unpkg.com/redux@3.7.2/dist/redux.js" data-lib="redux"></script>
+<script src="https://unpkg.com/react-redux@5.0.6/dist/react-redux.js" data-lib="react-redux"></script>
 
 <script>
 
-const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => s.dataset.lib);
+const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => [s.dataset.lib, s.dataset.name]);
 const swUrl = 'sw.js?l='+JSON.stringify(libs);
-navigator.serviceWorker.register(swUrl).then(sw => {
-	console.log("Registered", sw);
-}).catch(err => {
-	console.log("Error", err);
-})
-.then(() => {
-	load('./src/index.js');
-});
+navigator.serviceWorker.register(swUrl)
+	.then(sw => sw.update())
+	.then(sw => {
+		load('./src/index.js');
+	})
+	.catch(err => {
+		console.log("Error", err);
+	});
+
 // navigator.serviceWorker.getRegistration(swUrl).then(registration => {
-// 	console.log(registration);
-// 	if (!registration) {
-		
-// 	}
+	
 // });
 
 const load = src => new Promise((resolve, reject) => {

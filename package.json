@@ -8,10 +8,13 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "fserve": "file:../fserve"
+    "fserve": "^1.0.3",
+    "rollup": "^0.50.0"
   },
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "start": "serve 9000",
+    "rollup": "rollup -c > /dev/null"
   },
   "repository": {
     "type": "git",

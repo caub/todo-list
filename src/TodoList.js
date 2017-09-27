@@ -1,42 +1,55 @@
-import React from 'react';
+import { createElement as v, PureComponent } from 'react';
 import { connect } from 'react-redux';
 import TodoItem from './TodoItem';
 import TodoTime from './TodoTime';
 import {updateHeights} from './utils';
 
-const v = React.createElement;
-const {round} = Math;
 
 function restorePointerEvents(li){
 	li.style.pointerEvents = '';
 }
 
-export default class TodoList extends React.PureComponent {
+const mapStateToProps = (state, ownProps) => {
+	// console.log('todolist__', 'states', state, "props",  ownProps)
+	return {
+		todos: state.value
+		// todo map also state ones, but how to do then, to update a local state? from the container wrappper?
+	};
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+	undo: () => dispatch({type: 'undo'}),
+	redo: () => dispatch({type: 'redo'}),
+	updateTodo: (i, todo) => {
+		dispatch({type: 'updateTodo', i, todo});
+	},
+	onDrop: todos => {
+		dispatch({type: 'update', todos});
+	}
+});
+
+class List extends PureComponent {
 
 	constructor(props){
 		super(props);
 		this.state = {todos: undefined, dragI: -1}; // local state, serves during dragging
-		
-		this.updateTodo=(i, todo)=>{ // update i-th todo item with the object todo
-			const {todos} = this.props;
-			const todo2 = Object.assign({}, todos[i], todo);
-			this.props.update(Object.assign(todos.slice(), {[i]: todo2})); // make a copy and set todo at i-th position
-		};
-		this.drop = e =>{
-			if (this.state.dragI < 0) return;
-			e.preventDefault();
-			this.props.update(this.state.todos);
-		};
-		this.dragEnd = e =>{
+
+		this.dragEnd = e => {
 			this.setState({todos:undefined, dragI:-1});
 		};
 
 		this.updateHeights = () => updateHeights(this.refs.list);
+
+		this.onDrop = e => {
+			if (this.state.dragI < 0) return;
+			e.preventDefault();
+			this.props.onDrop(this.state.todos);
+		};
 	}
 
 
 	dragOver(e, i){
-		const {dragI, todos, transitioning} = this.state;
+		const {dragI, todos} = this.state;
 		if (dragI<0 || dragI===i) return;
 		e.preventDefault();
 
@@ -66,49 +79,63 @@ export default class TodoList extends React.PureComponent {
 		e.dataTransfer.setDragImage(e.currentTarget.parentNode, e.clientX - left, e.clientY - top);
 	}
 
+
 	componentDidMount(){
 		this.updateHeights();
 		window.addEventListener('resize', this.updateHeights);
 		this.refs.list.addEventListener('keyup', this.updateHeights, true);
+
+		window.addEventListener('keydown', e=>{
+			if (document.activeElement.isContentEditable) return;
+			if (e.ctrlKey && e.shiftKey && e.keyCode===90 || e.ctrlKey && e.keyCode===89)
+				this.props.redo();
+			else if (e.ctrlKey && e.keyCode===90)
+				this.props.undo();
+		});
 	}
+
 	componentDidUpdate(p,s){
 		this.updateHeights();
 	}
-	
 
-	render() { // todos is in priority searched in local state, when it's undefined, we take it in props
-		const {todos=this.props.todos, dragI} = this.state;
-
+	render() {
+		const {todos = this.props.todos, dragI} = this.state; // todos is searched in local state, when it's undefined, we take it in props
 		// console.log('render todo list', this.state.todos==undefined, ...todos.map((t,i)=>[i, t.text]));
 
 		return v('ol', {
 				ref:'list',
-				onDragOver: e=> dragI>=0 && e.preventDefault(),
-				onDrop: this.drop,
+				onDragOver: e => dragI >= 0 && e.preventDefault(),
+				onDrop: this.onDrop,
 				onDragEnd: this.dragEnd
 			},
-			todos.map((todo,i)=>
+			todos.map((todo, i)=>
 				v('li', {key:todo.id,
-						onDragOver: e=>this.dragOver(e,i),
-						onDrop: this.drop,
-						style: {opacity:dragI===i?.5:1}
+						onDragOver: e => this.dragOver(e, i),
+						onDrop: this.onDrop,
+						style: {opacity:dragI === i ? .5 : 1}
 					},
 					v(TodoTime, {
-						onDragStart: e=>this.dragStart(e,i),
-						onDrop: this.drop, 
+						onDragStart: e => this.dragStart(e, i),
+						onDrop: this.onDrop, 
 						checked: Boolean(todo.checked),
 						date: todo.date,
-						onChange:e=>this.updateTodo(i, {checked:e.target.checked})
+						onChange:e => this.props.updateTodo(i, {checked: e.target.checked})
 					}),
 					v(TodoItem, {
 						text: todo.text,
 						checked: Boolean(todo.checked),
-						onDrop: this.drop,
-						update: text=>this.updateTodo(i,{text})
+						onDrop: this.onDrop,
+						update: text => this.props.updateTodo(i, {text})
 					})
 				)
 			)
 		);
 	}
-};
+}
 
+const TodoList = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(List);
+
+export default TodoList;
