@@ -2,6 +2,13 @@ const libs = new Map(JSON.parse(new URLSearchParams(location.search).get('l')));
 
 const srcUrl = location.origin + location.pathname.slice(0, location.pathname.lastIndexOf('/')) + '/src/';
 
+self.addEventListener('install', event => {
+	self.skipWaiting();
+
+	// event.waitUntil();
+});
+
+
 self.addEventListener('fetch', function(event) {
 
 	if (event.request.url.startsWith(srcUrl)) {
