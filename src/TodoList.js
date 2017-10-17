@@ -111,12 +111,10 @@ class List extends PureComponent {
 			todos.map((todo, i)=>
 				v('li', {key:todo.id,
 						onDragOver: e => this.dragOver(e, i),
-						onDrop: this.onDrop,
 						style: {opacity:dragI === i ? .5 : 1}
 					},
 					v(TodoTime, {
-						onDragStart: e => this.dragStart(e, i),
-						onDrop: this.onDrop, 
+						onDragStart: e => this.dragStart(e, i), 
 						checked: Boolean(todo.checked),
 						date: todo.date,
 						onChange:e => this.props.updateTodo(i, {checked: e.target.checked})
@@ -124,7 +122,6 @@ class List extends PureComponent {
 					v(TodoItem, {
 						text: todo.text,
 						checked: Boolean(todo.checked),
-						onDrop: this.onDrop,
 						update: text => this.props.updateTodo(i, {text})
 					})
 				)
