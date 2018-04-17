@@ -1,79 +1,100 @@
+const UNDO = 'UNDO';
+const REDO = 'REDO';
+const UPDATE = 'UPDATE';
+const UPDATE_TODO = 'UPDATE_TODO';
+const ADD_TODO = 'ADD_TODO';
+const DELETE_TODO = 'DELETE_TODO';
+const TRASH = 'TRASH';
+const SORT_BY_TEXT = 'SORT_BY_TEXT';
+const SORT_BY_TIME = 'SORT_BY_TIME';
 
-const actions = {
-	undo: state => state.prev && state.prev.length ? {
-			prev: state.prev.slice(0,-1), 
-			value: state.prev[state.prev.length-1], 
-			next: [state.value].concat(state.next || [])
-		} : state,
+// action creators:
+export const undo = () => ({ type: UNDO });
+export const redo = () => ({ type: REDO });
+export const update = value => ({ type: UPDATE, value });
+export const updateTodo = value => ({ type: UPDATE_TODO, value });
+export const addTodo = value => ({ type: ADD_TODO, value });
+export const deleteTodo = id => ({ type: DELETE_TODO, value: id });
+export const trash = () => ({ type: TRASH });
+export const sortByText = () => ({ type: SORT_BY_TEXT });
+export const sortByTime = () => ({ type: SORT_BY_TIME });
 
-	redo: state => state.next && state.next.length ? {
+const historyPush = ({ value, prev = [], next }, newValue) => {
+	if (newValue.length === value.length && newValue.every((o, i) => o === value[i])) {
+		return { prev, value, next };
+	}
+	return {
+		value: newValue,
+		prev: prev.concat([value]),
+		next: undefined
+	}
+};
+
+const reducers = {
+	[UNDO]: state => state.prev && state.prev.length ? {
+		prev: state.prev.slice(0, -1),
+		value: state.prev[state.prev.length - 1],
+		next: [state.value].concat(state.next || [])
+	} : state,
+
+	[REDO]: state => state.next && state.next.length ? {
 		prev: (state.prev || []).concat([state.value]),
 		value: state.next[0],
 		next: state.next.slice(1)
 	} : state,
 
-	update: ({value, prev = []}, {todos}) => ({
-		value: todos,
-		prev: prev.concat([value])
-	}),
+	[UPDATE]: (state, todos) => historyPush(state, todos),
 
-	updateTodo: ({value, prev = []}, {i, todo}) => ({ // make a copy and set todo at i-th position
-		value: value.slice(0, i).concat(Object.assign({}, value[i], todo)).concat(value.slice(i+1)),
-		prev: prev.concat([value])
-	}),
+	[UPDATE_TODO]: (state, todo) => historyPush(
+		state,
+		state.value.map(o => o.id === todo.id ? { ...o, ...todo } : o)
+	),
 
-	add: ({value, prev = []}) => {
-		const id = Math.max(1, ...value.map(t=>t.id)) + 1;
-		return {
-			value: [{id, text:'New todo #' + id, date: new Date()}].concat(value),
-			prev: prev.concat([value])
-		};
+	[ADD_TODO]: state => {
+		const id = Math.max(1, ...value.map(t => t.id)) + 1;
+		return historyPush(
+			state,
+			[{ id, text: 'New todo #' + id, date: new Date() }].concat(state.value)
+		);
 	},
 
-	trash: ({value, prev = []}) => ({
-		value: value.filter(t => !t.checked),
-		prev: prev.concat([value])
-	}),
+	[TRASH]: state => historyPush(state, state.value.filter(t => !t.checked)),
 
-	delete: ({value, prev = []}, {id}) => ({
-		value: value.filter(t => t.id !== id),
-		prev: prev.concat([value])
-	}),
+	[DELETE_TODO]: (state, id) => historyPush(state, state.value.filter(o => o.id !== id)),
 
-	sortByText: ({value, prev = []}) => {
-		const sort = value.slice().sort((a,b) => !a.checked === !b.checked ? a.text.localeCompare(b.text) : a.checked ? 1 : -1);
-		const isSorted = sort.length === value.length && value.every((ti, i) => ti.id === sort[i].id);
+	[SORT_BY_TEXT]: ({ value, prev = [] }) => {
+		const sorted = value.sort((a, b) => !a.checked === !b.checked ? a.text.localeCompare(b.text) : a.checked ? 1 : -1);
+		const isDiff = Array.from(value, ([k, v]) => ti.id === sorted[i].id);
 
-		return isSorted ? {
-			value: sort.reverse(),
-			alpha:'desc',
+		return isDiff ? {
+			value: sorted.reverse(),
+			alpha: 'desc',
 			prev: prev.concat([value])
 		} : {
-			value: sort,
-			alpha:'asc',
-			prev: prev.concat([value])
-		};
+				value: sorted,
+				alpha: 'asc',
+				prev: prev.concat([value])
+			};
 	},
 
-	sortByTime: ({value, prev = []}) => {
-		const sort = value.slice().sort((a,b) => !a.checked === !b.checked ? a.date-b.date : a.checked ? 1 : -1);
-		const isSorted = sort.length === value.length && value.every((ti, i) => ti.id === sort[i].id);
+	[SORT_BY_TIME]: ({ value, prev = [] }) => {
+		const sorted = value.sort((a, b) => !a.checked === !b.checked ? a.date - b.date : a.checked ? 1 : -1);
+		const isDiff = value.every((ti, i) => ti.id === sorted[i].id);
 
-		return isSorted ? {
-			value: sort.reverse(),
-			time:'desc',
+		return isDiff ? {
+			value: sorted.reverse(),
+			time: 'desc',
 			prev: prev.concat([value])
 		} : {
-			value: sort,
-			time:'asc',
-			prev: prev.concat([value])
-		};
+				value: sorted,
+				time: 'asc',
+				prev: prev.concat([value])
+			};
 	}
-
 };
 
 
-export default function (state = {}, action) {
-	const fn = actions[action.type];
-	return fn ? fn(state, action) : state;
+export default function (state = {}, { type, value }) {
+	const fn = reducers[type];
+	return fn ? fn(state, value) : state;
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8" name="viewport" content="width=device-width">
 	<title></title>
@@ -11,50 +12,51 @@
 
 <body>
 
-<header>
-	<h1><a href="https://github.com/caub/todo-list">Todo List</a></h1>
-</header>
-<main>
-	
+	<header>
+		<h1>
+			<a href="https://github.com/caub/todo-list">Todo List</a>
+		</h1>
+	</header>
+	<main>
 
-	<div id="todoapp"></div>
 
-</main>
+		<div id="todoapp"></div>
 
-<script src="https://unpkg.com/react@16.0.0/umd/react.production.min.js" data-lib="react"></script>
-<script src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js" data-lib="react-dom" data-name="ReactDOM"></script>
-<script src="https://unpkg.com/redux@3.7.2/dist/redux.js" data-lib="redux"></script>
-<script src="https://unpkg.com/react-redux@5.0.6/dist/react-redux.js" data-lib="react-redux"></script>
+	</main>
 
-<script>
+	<script src="https://unpkg.com/react@16.3.2/umd/react.production.min.js" data-lib="react"></script>
+	<script src="https://unpkg.com/react-dom@16.3.2/umd/react-dom.production.min.js" data-lib="react-dom" data-name="ReactDOM"></script>
+	<script src="https://unpkg.com/redux@3.7.2/dist/redux.js" data-lib="redux"></script>
+	<script src="https://unpkg.com/react-redux@5.0.7/dist/react-redux.js" data-lib="react-redux"></script>
 
-const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => [s.dataset.lib, s.dataset.name]);
-const swUrl = 'sw.js?l='+JSON.stringify(libs);
-navigator.serviceWorker.register(swUrl)
-	.then(sw => sw.update())
-	.then(sw => {
-		load('./src/index.js');
-	})
-	.catch(err => {
-		console.log("Error", err);
-	});
+	<script>
 
-// navigator.serviceWorker.getRegistration(swUrl).then(registration => {
-	
-// });
+		const libs = Array.from(document.body.querySelectorAll('script[data-lib]'), s => [s.dataset.lib, s.dataset.name]);
+		const swUrl = 'sw.js?l=' + JSON.stringify(libs);
+		navigator.serviceWorker.register(swUrl)
+			.then(sw => sw.update())
+			.then(sw => {
+				load('./src/index.js');
+			})
+			.catch(err => {
+				console.log("Error", err);
+			});
 
-const load = src => new Promise((resolve, reject) => {
-	var script = document.createElement('script');
-	script.setAttribute('type', 'module');
-	script.setAttribute('src', src);
-	script.onload = resolve;
-	script.onerror = reject;
-	document.body.appendChild(script);
-})
-</script>
+		// navigator.serviceWorker.getRegistration(swUrl).then(registration => {
+
+		// });
+
+		const load = src => new Promise((resolve, reject) => {
+			var script = document.createElement('script');
+			script.setAttribute('type', 'module');
+			script.setAttribute('src', src);
+			script.onload = resolve;
+			script.onerror = reject;
+			document.body.appendChild(script);
+		})
+	</script>
 
 
 </body>
+
 </html>
-
-

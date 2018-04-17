@@ -6,7 +6,8 @@ export default {
   //   }),
   //   uglify()
   // ],
+  external: ['react', 'react-dom', 'redux', 'react-redux'],
   name: 'todolist',
-  dest: 'todo-list.js', 
+  dest: 'todo-list.js',
   format: 'iife'
 };
