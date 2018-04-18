@@ -1,6 +1,8 @@
+html {
+	min-height: 100vh;
+}
 body {
 	font-family: 'Open Sans', sans-serif;
-	
 	/*font-size: 1.5em;*/
 	/*--grad: 80%;*/
 }

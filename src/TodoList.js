@@ -21,12 +21,6 @@ class List extends PureComponent {
 		};
 
 		this.updateHeights = () => updateHeights(this.list);
-
-		this.drop = e => {
-			if (this.state.dragI < 0) return;
-			e.preventDefault();
-			this.props.update(this.state.todos);
-		};
 	}
 
 
@@ -74,6 +68,15 @@ class List extends PureComponent {
 			else if (e.ctrlKey && e.key === 'z')
 				this.props.undo();
 		});
+
+		document.addEventListener('dragover', e => {
+			if (this.state.dragI >= 0) e.preventDefault();
+		})
+		document.addEventListener('drop', e => {
+			if (this.state.dragI < 0) return;
+			e.preventDefault();
+			this.props.update(this.state.todos);
+		})
 	}
 
 	componentDidUpdate(p, s) {
@@ -82,12 +85,9 @@ class List extends PureComponent {
 
 	render() {
 		const { todos = this.props.todos, dragI } = this.state; // todos is searched in local state, when it's undefined, we take it in props
-		// console.log('render todo list', this.state.todos==undefined, ...todos.map((t,i)=>[i, t.text]));
 
 		return v('ol', {
 			ref: el => { this.list = el; },
-			onDragOver: e => dragI >= 0 && e.preventDefault(),
-			onDrop: this.drop,
 			onDragEnd: this.dragEnd
 		},
 			todos.map((todo, i) =>
