@@ -69,9 +69,9 @@ class List extends PureComponent {
 
 		window.addEventListener('keydown', e => {
 			if (document.activeElement.isContentEditable) return;
-			if (e.ctrlKey && e.shiftKey && e.keyCode === 90 || e.ctrlKey && e.keyCode === 89)
+			if (e.ctrlKey && e.shiftKey && e.key === 'z' || e.ctrlKey && e.key === 'y')
 				this.props.redo();
-			else if (e.ctrlKey && e.keyCode === 90)
+			else if (e.ctrlKey && e.key === 'z')
 				this.props.undo();
 		});
 	}

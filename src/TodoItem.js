@@ -30,10 +30,10 @@ export default class TodoItem extends PureComponent {
 			// }
 		};
 		this.shortcuts = e => {
-			if (e.ctrlKey && (e.keyCode == 66 || e.keyCode == 73)) { // ctrl+b or ctrl+i
+			if (e.ctrlKey && (e.key === 'b' || e.key === 'i')) {
 				const r = getRange();
 				if (r.isCollapsed) return;
-				const s = r + '', pattern = '*'.repeat(e.keyCode == 66 ? 2 : 1);
+				const s = r + '', pattern = '*'.repeat(e.key === 'b' ? 2 : 1);
 				const s2 = s.startsWith(pattern) && s.endsWith(pattern) ? s.slice(pattern.length, -pattern.length) : pattern + s + pattern;
 				document.execCommand('insertText', null, s2);
 				const r2 = getRange();
