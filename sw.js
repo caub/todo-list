@@ -2,22 +2,18 @@ const libs = new Map(JSON.parse(new URLSearchParams(location.search).get('l')));
 
 const srcUrl = location.origin + location.pathname.slice(0, location.pathname.lastIndexOf('/')) + '/src/';
 
+self.addEventListener('install', event => {
+	self.skipWaiting();
+	// event.waitUntil(
+	// 	caches.open('v2').then(cache => {
+	// 		return cache.addAll([
+	// 			'/',
+	// 		]);
+	// 	})
+	// );
 
-// const CACHE_NAME = 'caub-todolist';
-// const CACHE_VERSION = '1.0';
-
-// self.addEventListener('install', event => {
-// self.skipWaiting();
-// event.waitUntil<d<d(
-// 	caches
-// 		.open(CACHE_NAME + '-v' + CACHE_VERSION)
-// 		.then(cache => {
-// 			return cache.addAll([
-// 				new Request('./src/index.js')
-// 			]);
-// 		})
-// );
-// });
+	// caches.keys().then(keyList => Promise.all(keyList.map(k => k !== 'v2' && caches.delete(k))))
+});
 
 self.addEventListener('activate', event => {
 	event.waitUntil(clients.claim());
