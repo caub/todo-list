@@ -51,7 +51,7 @@ const reducers = {
 	),
 
 	[ADD_TODO]: state => {
-		const id = Math.max(1, ...value.map(t => t.id)) + 1;
+		const id = Math.max(1, ...state.value.map(t => t.id)) + 1;
 		return historyPush(
 			state,
 			[{ id, text: 'New todo #' + id, date: new Date() }].concat(state.value)
