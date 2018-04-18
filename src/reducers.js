@@ -62,11 +62,11 @@ const reducers = {
 
 	[DELETE_TODO]: (state, id) => historyPush(state, state.value.filter(o => o.id !== id)),
 
-	[SORT_BY_TEXT]: ({ value, prev = [] }) => {
-		const sorted = value.sort((a, b) => !a.checked === !b.checked ? a.text.localeCompare(b.text) : a.checked ? 1 : -1);
-		const isDiff = Array.from(value, ([k, v]) => ti.id === sorted[i].id);
+	[SORT_BY_TEXT]: ({ value, prev = [], alpha }) => {
+		const sorted = value.slice().sort((a, b) => !a.checked === !b.checked ? a.text.localeCompare(b.text) : a.checked ? 1 : -1);
+		const isSame = value.every((ti, i) => ti.id === sorted[i].id);
 
-		return isDiff ? {
+		return isSame ? {
 			value: sorted.reverse(),
 			alpha: 'desc',
 			prev: prev.concat([value])
@@ -77,13 +77,13 @@ const reducers = {
 			};
 	},
 
-	[SORT_BY_TIME]: ({ value, prev = [] }) => {
-		const sorted = value.sort((a, b) => !a.checked === !b.checked ? a.date - b.date : a.checked ? 1 : -1);
-		const isDiff = value.every((ti, i) => ti.id === sorted[i].id);
+	[SORT_BY_TIME]: ({ value, prev = [], time }) => {
+		const sorted = value.slice().sort((a, b) => !a.checked === !b.checked ? b.date - a.date : a.checked ? -1 : 1);
+		const isSame = value.every((ti, i) => ti.id === sorted[i].id);
 
-		return isDiff ? {
+		return isSame ? {
 			value: sorted.reverse(),
-			time: 'desc',
+			time: time === 'asc' ? 'desc' : 'asc',
 			prev: prev.concat([value])
 		} : {
 				value: sorted,
@@ -94,7 +94,7 @@ const reducers = {
 };
 
 
-export default function (state = {}, { type, value }) {
+export default (state = {}, { type, value }) => {
 	const fn = reducers[type];
 	return fn ? fn(state, value) : state;
 }

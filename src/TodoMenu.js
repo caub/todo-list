@@ -25,16 +25,41 @@ const styles = {
 const Menu = ({ alpha = 'asc', time = 'asc', onDrop, trash, addTodo, sortByText, sortByTime }) => (
 
 	v('div', { className: 'buttons' },
-		v('button', { title: 'Add a todo', onClick: addTodo }, v('i', { className: 'fa fa-plus' })),
-		v('button', { title: 'Sort by text', onClick: sortByText }, v('i', { className: 'fa fa-sort-alpha-' + alpha })),
-		v('button', { title: 'Sort by date', onClick: sortByTime }, v('i', { className: 'fa fa-sort-amount-' + time })),
-		v('button', { title: 'Drop completed', onClick: trash, onDrop, onDragOver: e => e.preventDefault() }, v('i', { className: 'fa fa-trash-o' })),
+		v('button',
+			{
+				title: 'Add a todo',
+				onClick: addTodo
+			},
+			v('i', { className: 'fa fa-plus' })
+		),
+		v('button',
+			{
+				title: 'Sort by text',
+				onClick: sortByText
+			},
+			v('i', { className: 'fa fa-sort-alpha-' + alpha })
+		),
+		v('button',
+			{
+				title: 'Sort by date',
+				onClick: sortByTime
+			},
+			v('i', { className: 'fa fa-sort-amount-' + time })
+		),
+		v('button',
+			{
+				title: 'Drop completed',
+				onClick: trash,
+				onDrop, onDragOver: e => e.preventDefault()
+			},
+			v('i', { className: 'fa fa-trash-o' })
+		),
 		v('flash', null, 'ctrl+(shift+)z to undo/redo')
 	)
 );
 
 const TodoMenu = connect(
-	null,
+	({ alpha, time }) => ({ alpha, time }),
 	{
 		addTodo,
 		onDrop: e => {
