@@ -41,14 +41,13 @@ self.addEventListener('fetch', function (event) {
 								return `${l.slice(0, m2.index)}'${name + (/\.js*$/.test(name) ? '' : '.js')}';`;
 							}
 							if (libs.has(name)) {
-								if (l.includes('{')) {
-									const m3 = l.match(/(\{[\w\s,]+\})\s+from\s+'([\w-]+)';?$/);
-									const libName = libs.get(name) || m3[2].split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
-									return `const ${m3[1].replace(/\bas\b/g, ':')} = ${libName};`
-								}
-								return ''; //`${l.slice(0, m2.index)}'${libs.get(name)}';`; // the dist versions are not easily importable, so using <script> rather for now in index.html, todo try the normal entry point of react.. if it's not slow
+								const m3 = l.match(/import (\{[\w\s,]+\}|[\w\s,]+)\s+from\s+'([\w-]+)';?$/);
+								const libName = libs.get(name) || m3[2].split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+								return m3[1][0] === '{' ?
+									`const ${m3[1].replace(/\bas\b/g, ':')} = ${libName};` :
+									`const ${m3[1]} = ${libName}.default;`; // well it sucks, need to support import foo, {..}
 							}
-							return l;
+							return '';
 						});
 					const newText = lines.join('\n') + '\n' + text.slice(m.index);
 					return new Response(newText, { headers: { 'Content-Type': 'application/javascript' } });

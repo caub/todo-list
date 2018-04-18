@@ -1,31 +1,25 @@
 import { createElement as v } from 'react';
 import { connect } from 'react-redux';
+import injectSheet from 'react-jss';
 import { addTodo, deleteTodo, trash, sortByText, sortByTime } from './reducers';
 
-// const mapDispatchToProps = (dispatch, ownProps) => ({
-// 	onDrop: e => {
-// 		e.preventDefault();
-// 		const text = e.dataTransfer.getData('text');
-// 		try {
-// 			const data = JSON.parse(text);
-// 			dispatch({ type: 'delete', id: data.id });
-// 		} catch (e) {
-// 			console.error(e)
-// 		}
-// 	},
-// 	onTrash: e => {
-// 		dispatch({ type: 'trash' });
-// 	},
-// 	onAdd: e => {
-// 		dispatch({ type: 'add' });
-// 	},
-// 	onSortByTime: e => {
-// 		dispatch({ type: 'sortByTime' });
-// 	},
-// 	onSortByText: e => {
-// 		dispatch({ type: 'sortByText' });
-// 	}
-// });
+const styles = {
+	flash: {
+		opacity: .5,
+		padding: '0 1em',
+		fontSize: 12,
+		fontFamily: 'monospace',
+	},
+
+	buttons: {
+		display: 'flex',
+		marginBottom: 8,
+		alignItems: 'center',
+		'& button[disabled]': {
+			opacity: .1
+		}
+	}
+};
 
 
 const Menu = ({ alpha = 'asc', time = 'asc', onDrop, trash, addTodo, sortByText, sortByTime }) => (
@@ -62,4 +56,4 @@ const TodoMenu = connect(
 	}
 )(Menu);
 
-export default TodoMenu;
+export default injectSheet(styles)(TodoMenu);

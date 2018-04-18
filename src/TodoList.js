@@ -1,9 +1,79 @@
 import { createElement as v, PureComponent } from 'react';
 import { connect } from 'react-redux';
+import injectSheet from 'react-jss';
 import TodoItem from './TodoItem';
 import TodoTime from './TodoTime';
 import { updateHeights } from './utils';
 import { update, updateTodo, undo, redo } from './reducers';
+
+const styles = {
+	'@global': {
+		html: {
+			minHeight: '100vh'
+		},
+		body: {
+			fontFamily: `'Open Sans', sans-serif`
+		},
+		header: {
+			textAlign: 'center'
+		},
+		'@media (min-width: 600px)': {
+			main: { margin: '0 3em' }
+		},
+		'@media (min-width: 900px)': {
+			main: { margin: '0 5em' }
+		},
+		'i.fa': {
+			pointerEvents: 'none',
+			fontSize: '1.3em'
+		},
+		button: {
+			border: 'none',
+			background: 'none',
+			outline: 'none',
+			cursor: 'pointer'
+		},
+		'input:not([type]), input[type=text], li div': {
+			fontSize: '1.2em'
+		}
+	},
+	list: {
+		listStyle: 'none',
+		padding: 0,
+		margin: 0,
+		position: 'relative',
+		height: 0,
+		transition: 'all .3s ease-in-out',
+		'&:empty': {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+			minHeight: 200,
+			outline: 'auto rgba(0,0,0,.2)',
+		},
+		'&:empty::before': {
+			content: `'No todos!'`,
+			fontSize: '2em',
+			opacity: .7
+		}
+	},
+	item: {
+		position: 'absolute',
+		width: '100%',
+		backgroundColor: 'rgba(240,240,240,.5)',
+		display: 'flex',
+		alignItems: 'center',
+		transition: 'all .3s ease-in-out',
+		'&:first-child': {
+			borderTopLeftRadius: 3,
+			borderTopRightRadius: 3
+		},
+		'&:last-child': {
+			borderBottomLeftRadius: 3,
+			borderBottomRightRadius: 3
+		}
+	}
+};
 
 
 function restorePointerEvents(li) {
@@ -84,14 +154,17 @@ class List extends PureComponent {
 	}
 
 	render() {
+		const { classes } = this.props;
 		const { todos = this.props.todos, dragI } = this.state; // todos is searched in local state, when it's undefined, we take it in props
 
 		return v('ol', {
+			className: classes.list,
 			ref: el => { this.list = el; },
 			onDragEnd: this.dragEnd
 		},
 			todos.map((todo, i) =>
 				v('li', {
+					className: classes.item,
 					key: todo.id,
 					onDragOver: e => this.dragOver(e, i),
 					style: { opacity: dragI === i ? .5 : 1 }
@@ -118,4 +191,4 @@ const TodoList = connect(
 	{ undo, redo, updateTodo, update }
 )(List);
 
-export default TodoList;
+export default injectSheet(styles)(TodoList);

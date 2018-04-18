@@ -1,4 +1,19 @@
 import { createElement as v, PureComponent } from 'react';
+import injectSheet from 'react-jss';
+
+const styles = {
+	todo: {
+		minWidth: '2em',
+		padding: '.75rem 1rem',
+		flex: 1,
+		cursor: 'text',
+		whiteSpace: 'pre-wrap',
+		'& img': {
+			maxHeight: 70,
+			verticalAlign: 'middle'
+		}
+	}
+};
 
 const sel = getSelection();
 
@@ -8,7 +23,7 @@ function setRange(r) {
 }
 const getRange = () => sel.rangeCount ? sel.getRangeAt(0) : new Range();
 
-export default class TodoItem extends PureComponent {
+class TodoItem extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = { text: undefined };
@@ -22,7 +37,7 @@ export default class TodoItem extends PureComponent {
 		this.focus = e => {
 			if (this.state.text !== undefined || e.target.matches('a, a *')) return;
 			const propsText = this.props.text, evt = new KeyboardEvent('keyup', e);
-			this.setState({ text: propsText }, () => this.refs.div.dispatchEvent(evt));
+			this.setState({ text: propsText }, () => this.div.dispatchEvent(evt));
 			// console.log('focus');
 			// if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
 			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
@@ -49,17 +64,21 @@ export default class TodoItem extends PureComponent {
 	}
 
 	render() {
-		const stateText = this.state.text, propsText = this.props.text;
-		return v('div', Object.assign({
-			ref: 'div',
+		const { classes, text: propsText } = this.props;
+		const stateText = this.state.text;
+		return v('div', {
+			ref: el => { this.div = el; },
+			className: classes.todo,
 			onDrop: this.props.onDrop,
 			dangerouslySetInnerHTML: { __html: stateText || markdownToHtml(propsText) }, // final text (props) or text editing mode (state)
 			onMouseDown: this.focus,
-			onBlur: this.blur
-			// onKeyDown: this.shortcuts
-		}, !this.props.checked && stateText !== undefined && { contentEditable: '' }));
+			onBlur: this.blur,
+			// onKeyDown: this.shortcuts,
+			...!this.props.checked && stateText !== undefined && { contentEditable: '' }
+		});
 	}
-
 };
+
+export default injectSheet(styles)(TodoItem);
 
 const markdownToHtml = text => text.replace(/(!)?\[([^\]]+)\]\(([^)]+)\)/g, (_, i, t, u) => i ? `<img src="${u}" title="${t}" onload="event.target.dispatchEvent(new KeyboardEvent('keyup', event))">` : `<a href="${u}">${t}</a>`);
