@@ -8,20 +8,13 @@ import { update, updateTodo, undo, redo } from './reducers';
 
 const styles = {
 	'@global': {
-		html: {
-			minHeight: '100vh'
-		},
-		body: {
-			fontFamily: `'Open Sans', sans-serif`
-		},
-		header: {
-			textAlign: 'center'
-		},
-		'@media (min-width: 600px)': {
-			main: { margin: '0 3em' }
-		},
-		'@media (min-width: 900px)': {
-			main: { margin: '0 5em' }
+		main: {
+			'@media (min-width: 600px)': {
+				margin: '0 3em'
+			},
+			'@media (min-width: 900px)': {
+				margin: '0 5em'
+			}
 		},
 		'i.fa': {
 			pointerEvents: 'none',
