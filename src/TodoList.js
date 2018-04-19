@@ -64,14 +64,12 @@ const styles = {
 		'&:last-child': {
 			borderBottomLeftRadius: 3,
 			borderBottomRightRadius: 3
+		},
+		'&.inactive': {
+			pointerEvents: 'none',
 		}
 	}
 };
-
-
-function restorePointerEvents(li) {
-	li.style.pointerEvents = '';
-}
 
 class List extends PureComponent {
 
@@ -84,15 +82,19 @@ class List extends PureComponent {
 		};
 
 		this.updateHeights = () => updateHeights(this.list);
+		this.acceptDrag = e => {
+			if (this.state.dragI >= 0) e.preventDefault();
+		};
 	}
 
 
 	dragOver(e, i) {
 		const { dragI, todos } = this.state;
-		if (dragI < 0 || dragI === i) return;
-		e.preventDefault();
 
-		const { top, bottom } = e.currentTarget.getBoundingClientRect(),
+		if (dragI < 0 || dragI === i) return;
+
+		const li = e.currentTarget;
+		const { top, bottom } = li.getBoundingClientRect(),
 			// pivot = (bottom+top)/2; // easy way
 			dragHeight = this.list.children[dragI].offsetHeight,
 			pivot = dragHeight >= e.currentTarget.offsetHeight ?
@@ -107,8 +109,8 @@ class List extends PureComponent {
 		const todos3 = todos2.slice(0, i2).concat(todos[dragI]).concat(todos2.slice(i2));
 		this.setState({ todos: todos3, dragI: i2 });
 
-		e.currentTarget.style.pointerEvents = 'none';
-		setTimeout(restorePointerEvents, 250, e.currentTarget); // transitionend not reliable
+		li.classList.add('inactive');
+		setTimeout(() => li.classList.remove('inactive'), 250); // transitionend not reliable
 	}
 	dragStart(e, i) {
 		const { todos } = this.props;
@@ -121,25 +123,31 @@ class List extends PureComponent {
 
 	componentDidMount() {
 		this.updateHeights();
-		window.addEventListener('resize', this.updateHeights);
 		this.list.addEventListener('keyup', this.updateHeights, true);
+		window.addEventListener('resize', this.updateHeights);
 
-		window.addEventListener('keydown', e => {
+		this.keyDown = e => {
 			if (document.activeElement.isContentEditable) return;
 			if (e.ctrlKey && e.shiftKey && e.key === 'z' || e.ctrlKey && e.key === 'y')
 				this.props.redo();
 			else if (e.ctrlKey && e.key === 'z')
 				this.props.undo();
-		});
+		};
+		window.addEventListener('keydown', this.keyDown);
 
-		document.addEventListener('dragover', e => {
-			if (this.state.dragI >= 0) e.preventDefault();
-		})
-		document.addEventListener('drop', e => {
+		this.drop = e => {
 			if (this.state.dragI < 0) return;
 			e.preventDefault();
 			this.props.update(this.state.todos);
-		})
+		};
+
+		document.addEventListener('drop', this.drop);
+	}
+	componentWillUnmount() {
+		this.list.removeEventListener('keyup', this.updateHeights, true);
+		window.removeEventListener('resize', this.updateHeights);
+		window.removeEventListener('keydown', this.keyDown);
+		document.removeEventListener('drop', this.drop);
 	}
 
 	componentDidUpdate(p, s) {
@@ -153,7 +161,8 @@ class List extends PureComponent {
 		return v('ol', {
 			className: classes.list,
 			ref: el => { this.list = el; },
-			onDragEnd: this.dragEnd
+			onDragEnd: this.dragEnd,
+			onDragOver: this.acceptDrag,
 		},
 			todos.map((todo, i) =>
 				v('li', {
