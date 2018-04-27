@@ -1,5 +1,5 @@
 export default {
-  entry: 'src/index.js',
+  input: 'src/index.js',
   // plugins: [
   //   babel({
   //     runtimeHelpers: true
@@ -7,7 +7,16 @@ export default {
   //   uglify()
   // ],
   external: ['react', 'react-dom', 'redux', 'react-redux'],
-  name: 'todolist',
-  dest: 'todo-list.js',
-  format: 'iife'
+  globals: {
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    'react-jss': 'reactJss',
+    'react-redux': 'ReactRedux',
+    redux: 'redux'
+  },
+  output: {
+    name: 'todolist',
+    file: 'todo-list.js',
+    format: 'iife'
+  }
 };

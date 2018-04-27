@@ -36,13 +36,7 @@ class TodoItem extends PureComponent {
 		};
 		this.focus = e => {
 			if (this.state.text !== undefined || e.target.matches('a, a *')) return;
-			const propsText = this.props.text, evt = new KeyboardEvent('keyup', e);
-			this.setState({ text: propsText }, () => this.div.dispatchEvent(evt));
-			// console.log('focus');
-			// if (!e.currentTarget.contains(getRange().commonAncestorContainer)){
-			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
-			setRange(r);
-			// }
+			this.setState({ text: this.props.text }, () => this.div.focus());
 		};
 		this.shortcuts = e => {
 			if (e.ctrlKey && (e.key === 'b' || e.key === 'i')) {
