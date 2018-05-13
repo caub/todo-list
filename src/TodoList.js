@@ -128,7 +128,7 @@ class List extends PureComponent {
 
 		this.keyDown = e => {
 			if (document.activeElement.isContentEditable) return;
-			if (e.ctrlKey && e.shiftKey && e.key === 'z' || e.ctrlKey && e.key === 'y')
+			if (e.ctrlKey && e.key === 'Z' || e.ctrlKey && e.key === 'y')
 				this.props.redo();
 			else if (e.ctrlKey && e.key === 'z')
 				this.props.undo();
