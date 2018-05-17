@@ -45,7 +45,7 @@ const rgb1 = [120, 175, 255],
 	rgb3 = [255, 40, 0];
 
 
-function TodoTime({ classes, date, checked, onChange, onDragStart, onDrop }) {
+function TodoTime({ classes, date, ...props }) {
 	const time = (Date.now() - date.getTime()) / 60000,
 		k = 2 / (1 + 1440 / time) - 1;
 	const rgb = k < 0 ? rgb1.map((x, i) => Math.round(-x * k + rgb2[i] * (1 + k))) : rgb3.map((x, i) => Math.round(x * k + rgb2[i] * (1 - k)));
@@ -53,13 +53,10 @@ function TodoTime({ classes, date, checked, onChange, onDragStart, onDrop }) {
 	return v('input', {
 		className: classes.check,
 		draggable: true,
-		onDragStart,
-		onDrop,
 		type: 'checkbox',
 		title: timeago(time),
 		style: { backgroundImage: `radial-gradient(ellipse closest-side, rgba(${rgb},.8) 50%, transparent)` },
-		onChange,
-		checked
+		...props
 	});
 }
 

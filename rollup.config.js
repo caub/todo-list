@@ -6,17 +6,17 @@ export default {
   //   }),
   //   uglify()
   // ],
-  external: ['react', 'react-dom', 'redux', 'react-redux'],
-  globals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
-    'react-jss': 'reactJss',
-    'react-redux': 'ReactRedux',
-    redux: 'redux'
-  },
+  external: ['react', 'react-dom', 'redux', 'react-redux', 'react-jss'],
   output: {
     name: 'todolist',
     file: 'todo-list.js',
-    format: 'iife'
+    format: 'iife',
+    globals: {
+      react: 'React',
+      'react-dom': 'ReactDOM',
+      'react-jss': 'reactJss',
+      'react-redux': 'ReactRedux',
+      redux: 'redux'
+    },
   }
 };
