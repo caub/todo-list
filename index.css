@@ -1,5 +1,12 @@
 body {
-	/*font-size: 1.5em;*/
+	font-family: sans-serif;
+	font-weight: 200;
+}
+h1 {
+	font-weight: 600;
+}
+h1 > a {
+	text-decoration: none;
 }
 header {text-align: center;}
 
@@ -10,6 +17,10 @@ header {text-align: center;}
 	main {margin: 0 5em;}
 }
 
+main {
+	max-width: 800px;
+	margin: 2em auto;
+}
 
 #modify {
 	text-align: right;
@@ -22,22 +33,20 @@ i.fa {
 ol {
 	list-style: none;
 	padding: 0;
-	margin: 0;
 	position: relative;
+	transition: all .3s ease-in-out;
 }
 li {
-	position: absolute;
 	width: 100%;
-	transition: transform .3s ease-in-out;
+	position: absolute;
+	transition: all .3s ease-in-out;
 }
-li > label {
-	background-color: #eee;
-	display: block;
+li > div {
 	display: flex;
+  align-items: center;
+	background-color: #eee;
 }
-input:not([type]), input[type=text], li > label > span {
-	font-size: 1.2em;
-}
+
 input[type=checkbox] {
 /*	transform: scale(1.2) translateY(2px);
 	transform-origin: 100% 50%;
@@ -48,18 +57,27 @@ input[type=checkbox]:checked ~ * {
 	text-decoration: line-through;
 }
 
-span[contenteditable] {
-	display: inline-block;
-	vertical-align: middle;
-	min-width: 2em;
+.todo[contenteditable] {
 	cursor: text;
+}
+
+.todo {
+	padding: 1rem .8rem;
+	font-size: 1.6em;
+	min-width: 2em;
 	flex: 1;
 }
-span:first-of-type {
-	padding: .6rem .4rem 1rem;
+.handle {
+	font-size: 1.4em;
 	cursor:move;
+	margin: 0 .4rem;
 }
-time, span {padding: .8rem .4rem;}
+
+time {
+	font-size: 1.4em;
+	filter: opacity(.6);
+	margin: 0 .4rem;
+}
 
 button {
 	border: none;

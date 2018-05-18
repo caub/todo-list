@@ -2,144 +2,149 @@
 
 const {add, name, date, trash} = modify.elements;
 
-modify.addEventListener('submit', e=>{
+modify.addEventListener('submit', e => {
 	e.preventDefault();
 })
 
-name.addEventListener('click', e=>{
+name.addEventListener('click', e => {
 	const items = Array.from(list.children);
-	items.sort((a,b)=>a.textContent>b.textContent);
+	items.sort((a, b) => a.textContent > b.textContent);
 	for (let item of items)
 		list.appendChild(item);
 	update(list)
 })
 
-date.addEventListener('click', e=>{
+date.addEventListener('click', e => {
 	const items = Array.from(list.children);
-	items.sort((a,b)=>+b.dataset.time-a.dataset.time);
+	items.sort((a, b) => +b.dataset.time - a.dataset.time);
 	for (let item of items)
 		list.appendChild(item);
 	update(list)
 })
 
-trash.addEventListener('click', e=>{
+trash.addEventListener('click', e => {
 	Array.from(list.children)
-		.filter(li=>li.querySelector('input').checked)
-		.forEach(li=>li.remove());
+		.filter(li => li.querySelector('input').checked)
+		.forEach(li => li.remove());
 	update(list)
 })
 
-add.addEventListener('click', e=>{
-	list.appendChild(Todo({name:'New todo #'+list.childElementCount, time: new Date()}))
+add.addEventListener('click', e => {
+	list.appendChild(Todo({name: 'New todo #' + list.childElementCount, time: new Date()}))
 	update(list)
 })
 
-list.addEventListener('dragstart', e=>{
-	let dragged = e.target.closest('li'), dR = dragged.rect(), dC = (dR.top+dR.bottom)/2; // dragged center
-	e.dataTransfer.setData('text/custom', 'sort');
-	const dragover = e=>{
+list.addEventListener('dragstart', e => {
+	const dragged = e.target.closest('li');
+	const children = Array.from(list.children); // capture children order
+
+	const dragover = e => {
 		e.preventDefault();
 		const over = e.currentTarget;
-		if (over===dragged) return;
-		const oR = over.rect(), oC = (oR.top+oR.bottom)/2;
-		if(oC > dC && e.clientY > oC) {
-			if (over.nextElementSibling) list.insertBefore(dragged, over.nextElementSibling)
-			else list.appendChild(dragged)
-			update(list)
-			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
-		} else if (oC < dC && e.clientY < oC) {
-			list.insertBefore(dragged, over);
-			update(list)
-			dR = dragged.rect(); dC = (dR.top+dR.bottom)/2;
-		}
+		if (over === dragged) return;
+		const {top: dragTop} = dragged.getBoundingClientRect();
+		const {top, bottom} = over.getBoundingClientRect();
+		const dragHeight = dragged.offsetHeight;
 
+		// pivot = (bottom+top)/2; // easy way
+		const pivot = dragHeight >= e.currentTarget.offsetHeight ?
+			(dragTop < top ? top : bottom) :
+			(dragTop < top ? (bottom - dragHeight + top) / 2 : (top + dragHeight + bottom) / 2);
+
+		if (over === dragged.nextElementSibling && e.clientY <= pivot || over === dragged.previousElementSibling && e.clientY >= pivot) return;
+		over.style.pointerEvents = 'none';
+
+		if (e.clientY > pivot) {
+			over.after(dragged);
+		} else {
+			over.before(dragged);
+		}
+		update(list);
+		setTimeout(() => {over.style.pointerEvents = ''}, 300); // transitionend not reliable
 	};
-	const drop = e=>{
-		console.log(e.type);
-		for (let el of list.children)
-			el.removeEventListener('dragover', dragover);
+
+	const drop = e => {
+		children.forEach(el => el.removeEventListener('dragover', dragover));
 		list.removeEventListener('dragend', drop);
 		list.removeEventListener('drop', drop);
 	}
 
-	for (let el of list.children)
-			el.addEventListener('dragover', dragover);
+
+
+	children.forEach(el => el.addEventListener('dragover', dragover));
 	list.addEventListener('dragend', drop);
 	list.addEventListener('drop', drop);
 
-
-	// console.log('ds', e.target);
-	// e.dataTransfer.setDragImage(frag, e.clientX-e.target.offsetLeft, e.clientY-e.target.offsetY)
+	e.dataTransfer.setData('text/custom', 'sort');
+	const {left, top} = dragged.getBoundingClientRect();
+	e.dataTransfer.setDragImage(dragged, e.clientX - left, e.clientY - top);
 })
 
 
-list.addEventListener('click', e=>{
+list.addEventListener('click', e => {
 	if (e.target.isContentEditable) {
 		e.stopPropagation();
 		e.preventDefault();
-	} 
+	}
 })
-
 
 
 const todos = [{
 	name: 'Reply to John',
-	time: new Date(Date.now()-36*3.6e6)
+	time: new Date(Date.now() - 36 * 3.6e6)
 }, {
 	name: 'Clean home',
-	time: new Date(Date.now()-96*3.6e6)
+	time: new Date(Date.now() - 96 * 3.6e6)
 }, {
 	name: 'Fix issue buffer leak #77',
-	time: new Date(Date.now()-4*3.6e6)
+	time: new Date(Date.now() - 4 * 3.6e6)
 }];
 
-const Todo = ({name, time}) => h('li', {draggable: true, data:{time:time.getTime()}},
-		h('label',
-			h('span', '☰'),
-			h('input', {type:'checkbox'}),
-			h('span', {contentEditable:true}, name),
-			h('time', time.toLocaleString())
-		)
-	);
+const Todo = ({name, time}) => h('li', {'data-time': time.getTime()})(
+	h('div')(
+		h('span', {draggable: true, className: 'handle'})('☰'),
+		h('input', {type: 'checkbox'})(),
+		h('div', {contentEditable: true, className: 'todo'})(name),
+		h('time')(time.toLocaleString())
+	)
+);
 
 
 // init Todo List
 for (let todo of todos)
 	list.appendChild(Todo(todo))
 
-update(list)
-function update(list){
-	let y=0;
-	for (let el of list.children){
-		el.style.transform = `translateY(${y}px)`;
-		y+=el.offsetHeight;
+update(list);
+
+function update(list) {
+	let y = 0;
+	for (let i = 0; i < list.childElementCount; i++) {
+		list.children[i].style.transform = `translateY(${y}px)`;
+		y += list.children[i].offsetHeight;
 	}
-	list.style.height = y+'px';
+	list.style.height = y + 'px';
 }
-
-
 
 
 // DOM utils
 
-function h(tag, p, ...children){ // 'hyperscript' util function, to make quickly DOM elements
-	if (p instanceof Node||typeof p==='string'||Array.isArray(p)) return h(tag, null, p, ...children);
-	const el=document.createElement(tag);
-	if (p){
-		Object.assign(el, p);
-		if (p.style) Object.assign(el.style, p.style);
-		if (p.data) for (let i in p.data) el.dataset[i]=p.data[i];
-		for (let name in p){
-			if (name.startsWith('on') && p[name])
-				el.addEventListener(name.substring(2).toLowerCase(), p[name], true); // or el[name.toLowerCase()] = p[name];
-		}
+function h(nodeName, {style, className, ...attrs} = {}) {
+	const el = document.createElement(nodeName);
+	el.className = className;
+	if (typeof style === 'object') {
+		Object.assign(el.style, style);
+	} else if (typeof style === 'string') {
+		el.setAttribute('style', style);
 	}
-	[].concat(...children.map(c=>typeof c==='string'?document.createTextNode(c):c))// flatten a list of children, and make text nodes when needed
-	.forEach(c=>el.appendChild(c)) // and append them to el
-	return el;
+	Object.keys(attrs).forEach(k => {
+		if (typeof attrs[k] === 'function') {
+			el.addEventListener(name.replace(/^on/, '').toLowerCase(), attrs[k], true);
+		} else {
+			el.setAttribute(k, attrs[k]);
+		}
+	});
+	return (...children) => {
+		el.append(...children);
+		return el;
+	}
 }
-
-Element.prototype.rect = Element.prototype.getBoundingClientRect;
-Text.prototype.closest = function(s) {
-	return this.parentNode.closest(s);
-};
