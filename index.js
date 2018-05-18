@@ -42,25 +42,7 @@ list.addEventListener('dragstart', e => {
 		e.preventDefault();
 		const over = e.currentTarget;
 		if (over === dragged) return;
-		const {top: dragTop} = dragged.getBoundingClientRect();
-		const {top, bottom} = over.getBoundingClientRect();
-		const dragHeight = dragged.offsetHeight;
-
-		// pivot = (bottom+top)/2; // easy way
-		const pivot = dragHeight >= e.currentTarget.offsetHeight ?
-			(dragTop < top ? top : bottom) :
-			(dragTop < top ? (bottom - dragHeight + top) / 2 : (top + dragHeight + bottom) / 2);
-
-		if (over === dragged.nextElementSibling && e.clientY <= pivot || over === dragged.previousElementSibling && e.clientY >= pivot) return;
-		over.style.pointerEvents = 'none';
-
-		if (e.clientY > pivot) {
-			over.after(dragged);
-		} else {
-			over.before(dragged);
-		}
-		update(list);
-		setTimeout(() => {over.style.pointerEvents = ''}, 300); // transitionend not reliable
+		[over.style.order, dragged.style.order] = [dragged.style.order, over.style.order]
 	};
 
 	const drop = e => {
@@ -100,30 +82,18 @@ const todos = [{
 	time: new Date(Date.now() - 4 * 3.6e6)
 }];
 
-const Todo = ({name, time}) => h('li', {'data-time': time.getTime()})(
-	h('div')(
-		h('span', {draggable: true, className: 'handle'})('☰'),
-		h('input', {type: 'checkbox'})(),
-		h('div', {contentEditable: true, className: 'todo'})(name),
-		h('time')(time.toLocaleString())
-	)
+const Todo = ({name, time}, order) => h('li', {style: {order}, 'data-time': time.getTime()})(
+	h('span', {draggable: true, className: 'handle'})('☰'),
+	h('input', {type: 'checkbox'})(),
+	h('div', {contentEditable: true, className: 'todo'})(name),
+	h('time')(time.toLocaleString())
 );
 
 
 // init Todo List
-for (let todo of todos)
-	list.appendChild(Todo(todo))
-
-update(list);
-
-function update(list) {
-	let y = 0;
-	for (let i = 0; i < list.childElementCount; i++) {
-		list.children[i].style.transform = `translateY(${y}px)`;
-		y += list.children[i].offsetHeight;
-	}
-	list.style.height = y + 'px';
-}
+todos.forEach((todo, i) => {
+	list.appendChild(Todo(todo, i));
+});
 
 
 // DOM utils
