@@ -1,75 +1,6 @@
-// Simple Todo implementation in pure JavaScript, next step will be to use React to organize and simplify it
+// Simple Todo implementation in React, next step will be to use React to organize and simplify it
 
-const {add, name, date, trash} = modify.elements;
-
-modify.addEventListener('submit', e => {
-	e.preventDefault();
-})
-
-name.addEventListener('click', e => {
-	const items = Array.from(list.children);
-	items.sort((a, b) => a.textContent > b.textContent);
-	for (let item of items)
-		list.appendChild(item);
-	update(list)
-})
-
-date.addEventListener('click', e => {
-	const items = Array.from(list.children);
-	items.sort((a, b) => +b.dataset.time - a.dataset.time);
-	for (let item of items)
-		list.appendChild(item);
-	update(list)
-})
-
-trash.addEventListener('click', e => {
-	Array.from(list.children)
-		.filter(li => li.querySelector('input').checked)
-		.forEach(li => li.remove());
-	update(list)
-})
-
-add.addEventListener('click', e => {
-	list.appendChild(Todo({name: 'New todo #' + list.childElementCount, time: new Date()}))
-	update(list)
-})
-
-list.addEventListener('dragstart', e => {
-	const dragged = e.target.closest('li');
-	const children = Array.from(list.children); // capture children order
-
-	const dragover = e => {
-		e.preventDefault();
-		const over = e.currentTarget;
-		if (over === dragged) return;
-		[over.style.order, dragged.style.order] = [dragged.style.order, over.style.order]
-	};
-
-	const drop = e => {
-		children.forEach(el => el.removeEventListener('dragover', dragover));
-		list.removeEventListener('dragend', drop);
-		list.removeEventListener('drop', drop);
-	}
-
-
-
-	children.forEach(el => el.addEventListener('dragover', dragover));
-	list.addEventListener('dragend', drop);
-	list.addEventListener('drop', drop);
-
-	e.dataTransfer.setData('text/custom', 'sort');
-	const {left, top} = dragged.getBoundingClientRect();
-	e.dataTransfer.setDragImage(dragged, e.clientX - left, e.clientY - top);
-})
-
-
-list.addEventListener('click', e => {
-	if (e.target.isContentEditable) {
-		e.stopPropagation();
-		e.preventDefault();
-	}
-})
-
+const v = window.React.createElement;
 
 const todos = [{
 	name: 'Reply to John',
@@ -80,41 +11,105 @@ const todos = [{
 }, {
 	name: 'Fix issue buffer leak #77',
 	time: new Date(Date.now() - 4 * 3.6e6)
-}];
+}]
 
-const Todo = ({name, time}, order) => h('li', {style: {order}, 'data-time': time.getTime()})(
-	h('span', {draggable: true, className: 'handle'})('☰'),
-	h('input', {type: 'checkbox'})(),
-	h('div', {contentEditable: true, className: 'todo'})(name),
-	h('time')(time.toLocaleString())
-);
-
-
-// init Todo List
-todos.forEach((todo, i) => {
-	list.appendChild(Todo(todo, i));
-});
-
-
-// DOM utils
-
-function h(nodeName, {style, className, ...attrs} = {}) {
-	const el = document.createElement(nodeName);
-	el.className = className;
-	if (typeof style === 'object') {
-		Object.assign(el.style, style);
-	} else if (typeof style === 'string') {
-		el.setAttribute('style', style);
+class TodoApp extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			todos: props.todos.map((o, i) => ({ ...o, id: i, order: i }))
+		};
 	}
-	Object.keys(attrs).forEach(k => {
-		if (typeof attrs[k] === 'function') {
-			el.addEventListener(name.replace(/^on/, '').toLowerCase(), attrs[k], true);
-		} else {
-			el.setAttribute(k, attrs[k]);
-		}
-	});
-	return (...children) => {
-		el.append(...children);
-		return el;
+	addTodo() {
+		const { todos } = this.state;
+		const todo = {
+			id: todos.length + 1,
+			name: 'New todo #' + todos.length + 1,
+			time: new Date(),
+			order: todos.length
+		};
+		this.setState({
+			todos: [...todos, todo]
+		});
+	}
+	sortByName() {
+		const { todos } = this.state;
+		const newTodos = todos.slice();
+		this.setState({
+			todos: newTodos.sort((a, b) => a.name.localeCompare(b.name)).map((o, i) => ({ ...o, order: i }))
+		});
+	}
+	sortByDate() {
+		const { todos } = this.state;
+		const newTodos = todos.slice();
+		this.setState({
+			todos: newTodos.sort((a, b) => a.time - b.time).map((o, i) => ({ ...o, order: i }))
+		});
+	}
+	trashCompletedTodos() {
+		const { todos } = this.state;
+		this.setState({
+			todos: todos.filter(todo => !todo.checked)
+		});
+	}
+	updateTodo(i, patch) {
+		const { todos } = this.state;
+		this.setState({
+			todos: [...todos.slice(0, i), { ...todos[i], ...patch }, ...todos.slice(i + 1)]
+		});
+	}
+	dragEnd(e) {
+		this.setState({ dragged: undefined });
+	}
+	dragStart(e, i) {
+		e.dataTransfer.setData('text/custom', 'sort');
+		this.setState({ dragged: i });
+		const { left, top } = e.currentTarget.getBoundingClientRect();
+		e.dataTransfer.setDragImage(e.currentTarget, e.clientX - left, e.clientY - top);
+	}
+	dragOver(e, i) {
+		e.preventDefault();
+		const { dragged, todos } = this.state;
+		if (dragged === undefined || dragged === i) return;
+		// a bit ugly
+		[todos[dragged].order, todos[i].order] = [i, dragged]
+		this.setState({ todos: todos.slice() });
+	}
+	render() {
+		const { todos } = this.state;
+
+		return v('main', null,
+			v('form', { onSubmit: e => e.preventDefault() },
+				v('button', { title: 'Add a todo', onClick: () => this.addTodo() },
+					v('i', { className: 'fa fa-plus' })
+				),
+				v('button', { title: 'Sort by name', onClick: () => this.sortByName() },
+					v('i', { className: 'fa fa-sort-alpha-asc' })
+				),
+				v('button', { title: 'Sort by date', onClick: () => this.sortByDate() },
+					v('i', { className: 'fa fa-sort-amount-asc' })
+				),
+				v('button', { title: 'Clear completed', onClick: () => this.trashCompletedTodos() },
+					v('i', { className: 'fa fa-trash-o' })
+				)
+			),
+			v('ol', { onDragEnd: e => this.dragEnd(e) },
+				todos.map(({ id, name, checked, time, order }, i) => v('li', {
+					key: id,
+					draggable: true,
+					style: { order: order + 1 },
+					onDragStart: e => this.dragStart(e, i),
+					onDragOver: e => this.dragOver(e, i)
+				},
+					v('input', { type: 'checkbox', checked }),
+					v('span', { draggable: true, className: 'handle', onClick: () => this.updateTodo(i, { checked: !checked }) }, '☰'),
+					v('div', { contentEditable: true, className: 'todo' }, name),
+					v('time', null, time.toLocaleString())
+				))
+			),
+			'-----'
+		);
 	}
 }
+
+ReactDOM.render(v(TodoApp, { todos }), document.getElementById('root'))
